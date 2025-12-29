@@ -4,11 +4,6 @@ import { DatabaseService } from './database/db';
 import { registerProjectHandlers } from './ipc/project-handlers';
 import { registerFeatureHandlers } from './ipc/feature-handlers';
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-  app.quit();
-}
-
 process.env.DIST_ELECTRON = path.join(__dirname, '..');
 process.env.DIST = path.join(process.env.DIST_ELECTRON, '../dist-renderer');
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
