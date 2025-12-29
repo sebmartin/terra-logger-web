@@ -1,17 +1,18 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import electron from 'vite-plugin-electron';
-import renderer from 'vite-plugin-electron-renderer';
 import { rmSync } from 'node:fs';
 import path from 'node:path';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
-  rmSync('dist-electron', { recursive: true, force: true });
-
   const isServe = command === 'serve';
   const isBuild = command === 'build';
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG;
+
+  if (isBuild) {
+    rmSync('dist-electron', { recursive: true, force: true });
+  }
 
   return {
     plugins: [
@@ -55,8 +56,7 @@ export default defineConfig(({ command }) => {
             }
           }
         }
-      ]),
-      renderer()
+      ])
     ],
     resolve: {
       alias: {

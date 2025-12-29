@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode, useEffect } from 'react';
 import type { Project } from '../types/project';
 import type { Feature } from '../types/feature';
 
@@ -24,22 +24,22 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
-  const addFeature = (feature: Feature) => {
+  const addFeature = useCallback((feature: Feature) => {
     setFeatures((prev) => [...prev, feature]);
     setIsDirty(true);
-  };
+  }, []);
 
-  const updateFeatureInList = (id: string, updates: Partial<Feature>) => {
+  const updateFeatureInList = useCallback((id: string, updates: Partial<Feature>) => {
     setFeatures((prev) =>
       prev.map((f) => (f.id === id ? { ...f, ...updates } : f))
     );
     setIsDirty(true);
-  };
+  }, []);
 
-  const removeFeature = (id: string) => {
+  const removeFeature = useCallback((id: string) => {
     setFeatures((prev) => prev.filter((f) => f.id !== id));
     setIsDirty(true);
-  };
+  }, []);
 
   // Load features when project changes
   useEffect(() => {
@@ -67,7 +67,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value: ProjectContextType = {
+  const value: ProjectContextType = useMemo(() => ({
     currentProject,
     setCurrentProject,
     features,
@@ -79,7 +79,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     setSelectedFeatureId,
     isDirty,
     setIsDirty,
-  };
+  }), [currentProject, features, addFeature, updateFeatureInList, removeFeature, selectedFeatureId, isDirty]);
 
   return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
 }

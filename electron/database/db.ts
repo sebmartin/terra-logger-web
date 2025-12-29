@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import path from 'node:path';
 import { app } from 'electron';
 import { promises as fs } from 'node:fs';
-import { SCHEMA, DBProject, DBFeature, DBMeasurement } from './schema';
+import { SCHEMA, DBSite, DBProject, DBFeature, DBMeasurement } from './schema';
 
 export class DatabaseService {
   private db: Database.Database;
@@ -30,11 +30,103 @@ export class DatabaseService {
     this.db.close();
   }
 
+  // ==================== SITE OPERATIONS ====================
+
+  createSite(site: {
+    name: string;
+    description?: string;
+    bounds: any;
+  }): DBSite {
+    const now = Date.now();
+    const id = uuidv4();
+
+    const stmt = this.db.prepare(`
+      INSERT INTO sites (id, name, description, bounds, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+
+    stmt.run(
+      id,
+      site.name,
+      site.description || null,
+      JSON.stringify(site.bounds),
+      now,
+      now
+    );
+
+    return this.getSite(id)!;
+  }
+
+  getSite(id: string): DBSite | null {
+    const stmt = this.db.prepare('SELECT * FROM sites WHERE id = ?');
+    const row = stmt.get(id) as DBSite | undefined;
+    return row || null;
+  }
+
+  listSites(): DBSite[] {
+    const stmt = this.db.prepare('SELECT * FROM sites ORDER BY updated_at DESC');
+    return stmt.all() as DBSite[];
+  }
+
+  updateSite(
+    id: string,
+    updates: {
+      name?: string;
+      description?: string;
+      bounds?: any;
+    }
+  ): DBSite {
+    const now = Date.now();
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    if (updates.name !== undefined) {
+      fields.push('name = ?');
+      values.push(updates.name);
+    }
+    if (updates.description !== undefined) {
+      fields.push('description = ?');
+      values.push(updates.description);
+    }
+    if (updates.bounds !== undefined) {
+      fields.push('bounds = ?');
+      values.push(JSON.stringify(updates.bounds));
+    }
+
+    fields.push('updated_at = ?');
+    values.push(now);
+    values.push(id);
+
+    const stmt = this.db.prepare(`
+      UPDATE sites SET ${fields.join(', ')} WHERE id = ?
+    `);
+
+    stmt.run(...values);
+    return this.getSite(id)!;
+  }
+
+  deleteSite(id: string): void {
+    const stmt = this.db.prepare('DELETE FROM sites WHERE id = ?');
+    stmt.run(id);
+  }
+
+  listProjectsForSite(siteId: string): DBProject[] {
+    const stmt = this.db.prepare('SELECT * FROM projects WHERE site_id = ? ORDER BY updated_at DESC');
+    return stmt.all(siteId) as DBProject[];
+  }
+
+  listFeaturesForSite(siteId: string): DBFeature[] {
+    const stmt = this.db.prepare('SELECT * FROM features WHERE site_id = ? ORDER BY updated_at DESC');
+    return stmt.all(siteId) as DBFeature[];
+  }
+
   // ==================== PROJECT OPERATIONS ====================
 
   createProject(project: {
+    site_id: string;
     name: string;
     description?: string;
+    status?: string;
     bounds?: any;
     center?: any;
     zoom?: number;
@@ -44,16 +136,19 @@ export class DatabaseService {
     const id = uuidv4();
 
     const stmt = this.db.prepare(`
-      INSERT INTO projects (id, name, description, created_at, updated_at, bounds, center, zoom, settings)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO projects (id, site_id, name, description, status, created_at, updated_at, completed_at, bounds, center, zoom, settings)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
       id,
+      project.site_id,
       project.name,
       project.description || null,
+      project.status || 'planning',
       now,
       now,
+      null,
       project.bounds ? JSON.stringify(project.bounds) : null,
       project.center ? JSON.stringify(project.center) : null,
       project.zoom || null,
@@ -79,6 +174,7 @@ export class DatabaseService {
     updates: {
       name?: string;
       description?: string;
+      status?: string;
       bounds?: any;
       center?: any;
       zoom?: number;
@@ -96,6 +192,15 @@ export class DatabaseService {
     if (updates.description !== undefined) {
       fields.push('description = ?');
       values.push(updates.description);
+    }
+    if (updates.status !== undefined) {
+      fields.push('status = ?');
+      values.push(updates.status);
+      // Set completed_at when status changes to 'completed'
+      if (updates.status === 'completed') {
+        fields.push('completed_at = ?');
+        values.push(now);
+      }
     }
     if (updates.bounds !== undefined) {
       fields.push('bounds = ?');
@@ -134,7 +239,7 @@ export class DatabaseService {
   // ==================== FEATURE OPERATIONS ====================
 
   createFeature(
-    projectId: string,
+    parentId: string,
     feature: {
       type: string;
       name?: string;
@@ -142,18 +247,25 @@ export class DatabaseService {
       geometry: any;
       properties?: any;
       style?: any;
+      site_id?: string;
+      project_id?: string;
     }
   ): DBFeature {
     const now = Date.now();
     const id = uuidv4();
 
+    // Determine if this is a site or project feature
+    const siteId = feature.site_id || (feature.project_id ? null : parentId);
+    const projectId = feature.project_id || (feature.site_id ? null : parentId);
+
     const stmt = this.db.prepare(`
-      INSERT INTO features (id, project_id, type, name, description, geometry, properties, style, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO features (id, site_id, project_id, type, name, description, geometry, properties, style, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     stmt.run(
       id,
+      siteId,
       projectId,
       feature.type,
       feature.name || null,

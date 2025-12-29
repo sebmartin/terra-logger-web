@@ -1,10 +1,11 @@
+import { useCallback } from 'react';
 import { useProject } from '../context/ProjectContext';
 import type { NewFeature, FeatureUpdate } from '../types/feature';
 
 export function useFeatures() {
   const { currentProject, features, addFeature, updateFeatureInList, removeFeature } = useProject();
 
-  const createFeature = async (featureData: Omit<NewFeature, 'project_id'>) => {
+  const createFeature = useCallback(async (featureData: Omit<NewFeature, 'project_id'>) => {
     if (!currentProject) {
       throw new Error('No current project');
     }
@@ -29,9 +30,9 @@ export function useFeatures() {
       console.error('Failed to create feature:', error);
       throw error;
     }
-  };
+  }, [currentProject, addFeature]);
 
-  const updateFeature = async (id: string, updates: FeatureUpdate) => {
+  const updateFeature = useCallback(async (id: string, updates: FeatureUpdate) => {
     try {
       const updated = await window.electron.updateFeature(id, updates);
 
@@ -49,9 +50,9 @@ export function useFeatures() {
       console.error('Failed to update feature:', error);
       throw error;
     }
-  };
+  }, [updateFeatureInList]);
 
-  const deleteFeature = async (id: string) => {
+  const deleteFeature = useCallback(async (id: string) => {
     try {
       await window.electron.deleteFeature(id);
       removeFeature(id);
@@ -59,7 +60,7 @@ export function useFeatures() {
       console.error('Failed to delete feature:', error);
       throw error;
     }
-  };
+  }, [removeFeature]);
 
   return {
     features,

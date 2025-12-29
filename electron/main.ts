@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
 import path from 'node:path';
 import { DatabaseService } from './database/db';
+import { registerSiteHandlers } from './ipc/site-handlers';
 import { registerProjectHandlers } from './ipc/project-handlers';
 import { registerFeatureHandlers } from './ipc/feature-handlers';
 
@@ -57,16 +58,28 @@ function createWindow(): void {
 // Content Security Policy
 function setupCSP() {
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const isDev = VITE_DEV_SERVER_URL !== undefined;
+
+    // In development, Vite needs 'unsafe-inline' and 'unsafe-eval' for HMR
+    const scriptSrc = isDev
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      : "script-src 'self'";
+
+    // In development, allow connections to Vite dev server
+    const connectSrc = isDev
+      ? "connect-src 'self' http://localhost:* ws://localhost:* https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com"
+      : "connect-src 'self' https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com";
+
     callback({
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
           [
             "default-src 'self'",
-            "script-src 'self'",
+            scriptSrc,
             "style-src 'self' 'unsafe-inline'", // Leaflet requires inline styles
             "img-src 'self' data: https://*.mapbox.com https://api.mapbox.com",
-            "connect-src 'self' https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com",
+            connectSrc,
             "font-src 'self' data:",
             "worker-src 'self' blob:",
           ].join('; '),
@@ -82,6 +95,7 @@ function initializeServices() {
   db = new DatabaseService();
 
   // Register IPC handlers
+  registerSiteHandlers(db);
   registerProjectHandlers(db);
   registerFeatureHandlers(db);
 

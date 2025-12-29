@@ -4,7 +4,8 @@ export type FeatureType = 'Marker' | 'Polyline' | 'Polygon' | 'Rectangle' | 'Cir
 
 export interface Feature {
   id: string;
-  project_id: string;
+  site_id: string | null;      // For existing/permanent features
+  project_id: string | null;    // For proposed/planning features
   type: FeatureType;
   name: string | null;
   description: string | null;
@@ -25,7 +26,8 @@ export interface FeatureStyle {
 }
 
 export interface NewFeature {
-  project_id: string;
+  site_id?: string;      // Either site_id or project_id must be provided
+  project_id?: string;   // Either site_id or project_id must be provided
   type: FeatureType;
   name?: string;
   description?: string;
@@ -34,7 +36,7 @@ export interface NewFeature {
   style?: FeatureStyle;
 }
 
-export type FeatureUpdate = Partial<Omit<Feature, 'id' | 'project_id' | 'type' | 'created_at' | 'updated_at'>>;
+export type FeatureUpdate = Partial<Omit<Feature, 'id' | 'site_id' | 'project_id' | 'type' | 'created_at' | 'updated_at'>>;
 
 export interface Measurement {
   id: string;

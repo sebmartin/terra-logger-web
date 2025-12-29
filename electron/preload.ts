@@ -3,6 +3,15 @@ import type { IpcRendererEvent } from 'electron';
 
 // Define the API interface that will be exposed to renderer
 export interface ElectronAPI {
+  // Site operations
+  createSite: (site: any) => Promise<any>;
+  getSite: (id: string) => Promise<any>;
+  listSites: () => Promise<any[]>;
+  updateSite: (id: string, updates: any) => Promise<any>;
+  deleteSite: (id: string) => Promise<void>;
+  listSiteProjects: (siteId: string) => Promise<any[]>;
+  listSiteFeatures: (siteId: string) => Promise<any[]>;
+
   // Project operations
   createProject: (project: any) => Promise<any>;
   getProject: (id: string) => Promise<any>;
@@ -38,6 +47,18 @@ export interface ElectronAPI {
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
 const electronAPI: ElectronAPI = {
+  // Site operations
+  createSite: (site: any) => ipcRenderer.invoke('site:create', site),
+  getSite: (id: string) => ipcRenderer.invoke('site:get', id),
+  listSites: () => ipcRenderer.invoke('site:list'),
+  updateSite: (id: string, updates: any) =>
+    ipcRenderer.invoke('site:update', id, updates),
+  deleteSite: (id: string) => ipcRenderer.invoke('site:delete', id),
+  listSiteProjects: (siteId: string) =>
+    ipcRenderer.invoke('site:listProjects', siteId),
+  listSiteFeatures: (siteId: string) =>
+    ipcRenderer.invoke('site:listFeatures', siteId),
+
   // Project operations
   createProject: (project: any) => ipcRenderer.invoke('project:create', project),
   getProject: (id: string) => ipcRenderer.invoke('project:get', id),

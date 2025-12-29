@@ -156,8 +156,8 @@
   padding: 10px 20px;
   border-bottom: 1px solid #f0f0f0;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .feature-type {
@@ -168,11 +168,19 @@
   padding: 4px 8px;
   border-radius: 4px;
   text-transform: uppercase;
+  align-self: flex-start;
 }
 
 .feature-name {
   font-size: 14px;
   color: #333;
+  font-weight: 500;
+}
+
+.feature-measurement {
+  font-size: 12px;
+  color: #666;
+  font-family: monospace;
 }
 
 .empty-state-small {

@@ -109,12 +109,26 @@ export default function Sidebar() {
                 <p>No features yet. Use the drawing tools on the map to add shapes and markers.</p>
               </div>
             ) : (
-              features.map((feature) => (
-                <div key={feature.id} className="feature-item">
-                  <div className="feature-type">{feature.type}</div>
-                  <div className="feature-name">{feature.name || 'Unnamed'}</div>
-                </div>
-              ))
+              features.map((feature) => {
+                let measurement = '';
+                if (feature.properties?.distance) {
+                  const d = feature.properties.distance;
+                  measurement = `${d.km.toFixed(2)} km`;
+                } else if (feature.properties?.area) {
+                  const a = feature.properties.area;
+                  measurement = `${a.acres.toFixed(2)} acres`;
+                }
+
+                return (
+                  <div key={feature.id} className="feature-item">
+                    <div className="feature-type">{feature.type}</div>
+                    <div className="feature-name">{feature.name || 'Unnamed'}</div>
+                    {measurement && (
+                      <div className="feature-measurement">{measurement}</div>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
