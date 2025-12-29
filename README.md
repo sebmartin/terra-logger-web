@@ -26,9 +26,25 @@ An Electron desktop application for designing offgrid cabin layouts using geospa
 
 ## Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Node.js 18+ (Node 20 recommended - see `.nvmrc`)
+- npm, yarn, or pnpm
 - A free Mapbox account and access token
+
+### Recommended: Use nvm or volta
+
+This project includes a `.nvmrc` file specifying Node 20:
+
+**With nvm:**
+```bash
+nvm install  # Installs Node 20
+nvm use      # Uses Node 20
+```
+
+**With volta:**
+```bash
+volta install node@20
+# Volta automatically switches versions when you cd into this directory
+```
 
 ## Setup Instructions
 
