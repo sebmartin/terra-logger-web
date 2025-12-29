@@ -22,8 +22,106 @@ export class DatabaseService {
   }
 
   private initialize(): void {
+    // Run schema - creates tables if they don't exist
     this.db.exec(SCHEMA);
+
+    // Run migrations for existing databases
+    this.runMigrations();
+
     console.log('Database initialized successfully');
+  }
+
+  private runMigrations(): void {
+    // Check if migrations are needed by checking for schema_version table
+    const hasVersionTable = this.db.prepare(`
+      SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'
+    `).get();
+
+    if (!hasVersionTable) {
+      // First time or old database - check if we need to migrate
+      const hasSitesTable = this.db.prepare(`
+        SELECT name FROM sqlite_master WHERE type='table' AND name='sites'
+      `).get();
+
+      if (!hasSitesTable) {
+        // Old database detected - needs migration
+        console.log('Detected old database schema. Running migrations...');
+
+        try {
+          // Migration 1: Add site_id to projects if it doesn't exist
+          const projectsInfo = this.db.pragma('table_info(projects)');
+          const hasSiteId = projectsInfo.some((col: any) => col.name === 'site_id');
+
+          if (!hasSiteId) {
+            console.log('Adding site_id to projects table...');
+            this.db.exec(`ALTER TABLE projects ADD COLUMN site_id TEXT;`);
+            this.db.exec(`ALTER TABLE projects ADD COLUMN status TEXT NOT NULL DEFAULT 'planning';`);
+            this.db.exec(`ALTER TABLE projects ADD COLUMN completed_at INTEGER;`);
+          }
+
+          // Migration 2: Add site_id to features if it doesn't exist
+          const featuresInfo = this.db.pragma('table_info(features)');
+          const hasFeatureSiteId = featuresInfo.some((col: any) => col.name === 'site_id');
+
+          if (!hasFeatureSiteId) {
+            console.log('Adding site_id to features table...');
+            // SQLite doesn't support adding constraints in ALTER TABLE, so we need to:
+            // 1. Rename old table
+            // 2. Create new table with correct schema
+            // 3. Copy data
+            // 4. Drop old table
+
+            this.db.exec(`ALTER TABLE features RENAME TO features_old;`);
+
+            // Create new features table (from SCHEMA)
+            this.db.exec(`
+              CREATE TABLE features (
+                id TEXT PRIMARY KEY,
+                site_id TEXT,
+                project_id TEXT,
+                type TEXT NOT NULL,
+                name TEXT,
+                description TEXT,
+                geometry TEXT NOT NULL,
+                properties TEXT,
+                style TEXT,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL,
+                FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE,
+                FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+                CHECK ((site_id IS NOT NULL AND project_id IS NULL) OR (site_id IS NULL AND project_id IS NOT NULL))
+              );
+            `);
+
+            // Copy data from old table, keeping project_id
+            this.db.exec(`
+              INSERT INTO features (id, site_id, project_id, type, name, description, geometry, properties, style, created_at, updated_at)
+              SELECT id, NULL, project_id, type, name, description, geometry, properties, style, created_at, updated_at
+              FROM features_old;
+            `);
+
+            this.db.exec(`DROP TABLE features_old;`);
+
+            // Recreate index
+            this.db.exec(`CREATE INDEX IF NOT EXISTS idx_features_site ON features(site_id);`);
+            this.db.exec(`CREATE INDEX IF NOT EXISTS idx_features_project ON features(project_id);`);
+          }
+
+          console.log('Migrations completed successfully');
+        } catch (error) {
+          console.error('Migration failed:', error);
+          console.error('Please delete the database file and restart the app');
+        }
+      }
+
+      // Create schema_version table
+      this.db.exec(`
+        CREATE TABLE IF NOT EXISTS schema_version (
+          version INTEGER PRIMARY KEY
+        );
+      `);
+      this.db.exec(`INSERT OR REPLACE INTO schema_version (version) VALUES (1);`);
+    }
   }
 
   close(): void {
