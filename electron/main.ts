@@ -1,14 +1,14 @@
-import { app, BrowserWindow, ipcMain, dialog, session } from 'electron';
-import path from 'node:path';
-import { DatabaseService } from './database/db';
-import { registerSiteHandlers } from './ipc/site-handlers';
-import { registerProjectHandlers } from './ipc/project-handlers';
-import { registerFeatureHandlers } from './ipc/feature-handlers';
+import { app, BrowserWindow, ipcMain, dialog, session } from "electron";
+import path from "node:path";
+import { DatabaseService } from "./database/db";
+import { registerSiteHandlers } from "./ipc/site-handlers";
+import { registerLayerHandlers } from "./ipc/layer-handlers";
+import { registerFeatureHandlers } from "./ipc/feature-handlers";
 
-process.env.DIST_ELECTRON = path.join(__dirname, '..');
-process.env.DIST = path.join(process.env.DIST_ELECTRON, '../dist-renderer');
+process.env.DIST_ELECTRON = path.join(__dirname, "..");
+process.env.DIST = path.join(process.env.DIST_ELECTRON, "../dist-renderer");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
-  ? path.join(process.env.DIST_ELECTRON, '../../public')
+  ? path.join(process.env.DIST_ELECTRON, "../../public")
   : process.env.DIST;
 
 let mainWindow: BrowserWindow | null = null;
@@ -24,19 +24,19 @@ function createWindow(): void {
     minWidth: 800,
     minHeight: 600,
     webPreferences: {
-      preload: path.join(__dirname, '../preload/preload.js'),
+      preload: path.join(__dirname, "../preload/preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
       webSecurity: true,
       allowRunningInsecureContent: false,
     },
-    titleBarStyle: 'default',
+    titleBarStyle: "default",
     show: false, // Don't show until ready-to-show
   });
 
   // Show window when ready
-  mainWindow.once('ready-to-show', () => {
+  mainWindow.once("ready-to-show", () => {
     mainWindow?.show();
   });
 
@@ -46,11 +46,11 @@ function createWindow(): void {
     // Open DevTools in development
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(path.join(process.env.DIST!, 'index.html'));
+    mainWindow.loadFile(path.join(process.env.DIST!, "index.html"));
   }
 
   // Emitted when the window is closed.
-  mainWindow.on('closed', () => {
+  mainWindow.on("closed", () => {
     mainWindow = null;
   });
 }
@@ -73,16 +73,16 @@ function setupCSP() {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': [
+        "Content-Security-Policy": [
           [
             "default-src 'self'",
             scriptSrc,
             "style-src 'self' 'unsafe-inline'", // Leaflet requires inline styles
-            "img-src 'self' data: https://*.mapbox.com https://api.mapbox.com",
+            "img-src 'self' data: https://*.mapbox.com https://api.mapbox.com https://cdnjs.cloudflare.com",
             connectSrc,
             "font-src 'self' data:",
             "worker-src 'self' blob:",
-          ].join('; '),
+          ].join("; "),
         ],
       },
     });
@@ -96,28 +96,28 @@ function initializeServices() {
 
   // Register IPC handlers
   registerSiteHandlers(db);
-  registerProjectHandlers(db);
+  registerLayerHandlers(db);
   registerFeatureHandlers(db);
 
   // File dialog handlers
-  ipcMain.handle('dialog:openFile', async () => {
+  ipcMain.handle("dialog:openFile", async () => {
     const result = await dialog.showOpenDialog(mainWindow!, {
-      properties: ['openFile'],
+      properties: ["openFile"],
       filters: [
-        { name: 'GeoJSON', extensions: ['json', 'geojson'] },
-        { name: 'All Files', extensions: ['*'] },
+        { name: "GeoJSON", extensions: ["json", "geojson"] },
+        { name: "All Files", extensions: ["*"] },
       ],
     });
     return result;
   });
 
-  ipcMain.handle('dialog:saveFile', async () => {
+  ipcMain.handle("dialog:saveFile", async () => {
     const result = await dialog.showSaveDialog(mainWindow!, {
       filters: [
-        { name: 'GeoJSON', extensions: ['geojson'] },
-        { name: 'JSON', extensions: ['json'] },
+        { name: "GeoJSON", extensions: ["geojson"] },
+        { name: "JSON", extensions: ["json"] },
       ],
-      defaultPath: 'project.geojson',
+      defaultPath: "layer.geojson",
     });
     return result;
   });
@@ -130,7 +130,7 @@ app.whenReady().then(() => {
   initializeServices();
   createWindow();
 
-  app.on('activate', () => {
+  app.on("activate", () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -140,8 +140,8 @@ app.whenReady().then(() => {
 });
 
 // Quit when all windows are closed, except on macOS.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
     if (db) {
       db.close();
     }
@@ -150,13 +150,13 @@ app.on('window-all-closed', () => {
 });
 
 // Clean up on app quit
-app.on('before-quit', () => {
+app.on("before-quit", () => {
   if (db) {
     db.close();
   }
 });
 
 // Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught exception:', error);
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error);
 });

@@ -20,4 +20,6 @@ export interface NewSite {
   bounds: SiteBounds;
 }
 
-export type SiteUpdate = Partial<Omit<Site, 'id' | 'created_at' | 'updated_at'>>;
+export type SiteUpdate = Partial<
+  Omit<Site, "id" | "created_at" | "updated_at">
+>;

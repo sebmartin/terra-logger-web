@@ -1,6 +1,13 @@
-import type { Map as LeafletMap, LatLngBounds, LatLng } from 'leaflet';
+import type { Map as LeafletMap, LatLngBounds, LatLng } from "leaflet";
 
-export type DrawMode = 'select' | 'marker' | 'polyline' | 'polygon' | 'rectangle' | 'measure' | null;
+export type DrawMode =
+  | "select"
+  | "marker"
+  | "polyline"
+  | "polygon"
+  | "rectangle"
+  | "measure"
+  | null;
 
 export interface MapState {
   center: LatLng | null;

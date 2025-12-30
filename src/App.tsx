@@ -1,22 +1,22 @@
-import { MapProvider } from './context/MapContext';
-import { SiteProvider } from './context/SiteContext';
-import { ProjectProvider } from './context/ProjectContext';
-import Sidebar from './components/Sidebar/Sidebar';
-import MapContainer from './components/Map/MapContainer';
-import './App.css';
+import { MapProvider } from "./context/MapContext";
+import { SiteProvider } from "./context/SiteContext";
+import { LayerProvider } from "./context/LayerContext";
+import Sidebar from "./components/Sidebar/Sidebar";
+import MapContainer from "./components/Map/MapContainer";
+import "./App.css";
 
 function App() {
   return (
     <MapProvider>
       <SiteProvider>
-        <ProjectProvider>
+        <LayerProvider>
           <div className="app">
             <Sidebar />
             <div className="map-wrapper">
               <MapContainer />
             </div>
           </div>
-        </ProjectProvider>
+        </LayerProvider>
       </SiteProvider>
     </MapProvider>
   );

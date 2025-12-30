@@ -1,14 +1,22 @@
-import React, { createContext, useContext, useState, useMemo, useCallback, ReactNode } from 'react';
-import type { Site } from '../types/site';
-import type { Project } from '../types/project';
+import {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  ReactNode,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import type { Site } from "../types/site";
+import type { Layer } from "../types/layer";
 
 interface SiteContextType {
   currentSite: Site | null;
-  setCurrentSite: (site: Site | null) => void;
+  setCurrentSite: Dispatch<SetStateAction<Site | null>>;
   sites: Site[];
-  setSites: (sites: Site[]) => void;
-  siteProjects: Project[];
-  setSiteProjects: (projects: Project[]) => void;
+  setSites: Dispatch<SetStateAction<Site[]>>;
+  siteLayers: Layer[];
+  setSiteLayers: Dispatch<SetStateAction<Layer[]>>;
 }
 
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
@@ -16,16 +24,19 @@ const SiteContext = createContext<SiteContextType | undefined>(undefined);
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [currentSite, setCurrentSite] = useState<Site | null>(null);
   const [sites, setSites] = useState<Site[]>([]);
-  const [siteProjects, setSiteProjects] = useState<Project[]>([]);
+  const [siteLayers, setSiteLayers] = useState<Layer[]>([]);
 
-  const value: SiteContextType = useMemo(() => ({
-    currentSite,
-    setCurrentSite,
-    sites,
-    setSites,
-    siteProjects,
-    setSiteProjects,
-  }), [currentSite, sites, siteProjects]);
+  const value: SiteContextType = useMemo(
+    () => ({
+      currentSite,
+      setCurrentSite,
+      sites,
+      setSites,
+      siteLayers,
+      setSiteLayers,
+    }),
+    [currentSite, sites, siteLayers],
+  );
 
   return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;
 }
@@ -33,7 +44,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
 export function useSiteContext() {
   const context = useContext(SiteContext);
   if (context === undefined) {
-    throw new Error('useSiteContext must be used within a SiteProvider');
+    throw new Error("useSiteContext must be used within a SiteProvider");
   }
   return context;
 }

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import * as turf from '@turf/turf';
-import type { LatLng } from 'leaflet';
+import { useState } from "react";
+import * as turf from "@turf/turf";
+import type { LatLng } from "leaflet";
 
 export interface MeasurementResult {
   distance?: {
@@ -19,16 +19,19 @@ export interface MeasurementResult {
 }
 
 export function useMeasure() {
-  const [activeMeasurement, setActiveMeasurement] = useState<MeasurementResult | null>(null);
+  const [activeMeasurement, setActiveMeasurement] =
+    useState<MeasurementResult | null>(null);
   const [isMeasuring, setIsMeasuring] = useState(false);
 
-  const measureDistance = (latlngs: LatLng[]): MeasurementResult['distance'] => {
+  const measureDistance = (
+    latlngs: LatLng[],
+  ): MeasurementResult["distance"] => {
     if (latlngs.length < 2) {
       return { km: 0, miles: 0, meters: 0, feet: 0 };
     }
 
     const line = turf.lineString(latlngs.map((ll) => [ll.lng, ll.lat]));
-    const lengthKm = turf.length(line, { units: 'kilometers' });
+    const lengthKm = turf.length(line, { units: "kilometers" });
 
     return {
       km: lengthKm,
@@ -38,14 +41,17 @@ export function useMeasure() {
     };
   };
 
-  const measureArea = (latlngs: LatLng[]): MeasurementResult['area'] => {
+  const measureArea = (latlngs: LatLng[]): MeasurementResult["area"] => {
     if (latlngs.length < 3) {
       return { sqm: 0, sqkm: 0, acres: 0, hectares: 0, sqft: 0 };
     }
 
     // Close the polygon if it's not already closed
     const coords = latlngs.map((ll) => [ll.lng, ll.lat]);
-    if (coords[0][0] !== coords[coords.length - 1][0] || coords[0][1] !== coords[coords.length - 1][1]) {
+    if (
+      coords[0][0] !== coords[coords.length - 1][0] ||
+      coords[0][1] !== coords[coords.length - 1][1]
+    ) {
       coords.push(coords[0]);
     }
 

@@ -1,19 +1,18 @@
-import { useEffect, useRef } from 'react';
-import { useMap as useLeafletMap } from 'react-leaflet';
-import '@geoman-io/leaflet-geoman-free';
-import L from 'leaflet';
-import * as turf from '@turf/turf';
-import { useMap } from '../../context/MapContext';
-import { useFeatures } from '../../hooks/useFeatures';
-import { useProject } from '../../context/ProjectContext';
-import type { FeatureType } from '../../types/feature';
-import type { Feature } from '../../types/feature';
+import { useEffect, useRef } from "react";
+import { useMap as useLeafletMap } from "react-leaflet";
+import "@geoman-io/leaflet-geoman-free";
+import L from "leaflet";
+import * as turf from "@turf/turf";
+import { useFeatures } from "../../hooks/useFeatures";
+import { useLayer } from "../../context/LayerContext";
+import type { FeatureType } from "../../types/feature";
+import type { Feature } from "../../types/feature";
 
 export default function DrawingTools() {
   const leafletMap = useLeafletMap();
-  const { drawMode } = useMap();
-  const { features, createFeature, updateFeature, deleteFeature } = useFeatures();
-  const { currentProject } = useProject();
+  const { features, createFeature, updateFeature, deleteFeature } =
+    useFeatures();
+  const { selectedLayerId } = useLayer();
   const layersRef = useRef<Map<string, L.Layer>>(new Map());
 
   useEffect(() => {
@@ -21,7 +20,7 @@ export default function DrawingTools() {
 
     // Add Leaflet.PM controls
     leafletMap.pm.addControls({
-      position: 'topleft',
+      position: "topleft",
       drawMarker: true,
       drawPolyline: true,
       drawPolygon: true,
@@ -29,31 +28,30 @@ export default function DrawingTools() {
       drawCircle: false,
       drawCircleMarker: false,
       editMode: true,
-      dragMode: false,
+      dragMode: true,
       cutPolygon: false,
       removalMode: true,
     });
 
     // Configure global options
     leafletMap.pm.setGlobalOptions({
-      pmIgnore: false,
       snappable: true,
       snapDistance: 20,
       allowSelfIntersection: false,
       templineStyle: {
-        color: '#3388ff',
+        color: "#3388ff",
         weight: 4,
       },
       hintlineStyle: {
-        color: '#3388ff',
-        dashArray: '5,5',
+        color: "#3388ff",
+        dashArray: "5,5",
         weight: 2,
       },
       pathOptions: {
-        color: '#3388ff',
+        color: "#3388ff",
         weight: 4,
         opacity: 0.8,
-        fillColor: '#3388ff',
+        fillColor: "#3388ff",
         fillOpacity: 0.3,
       },
     });
@@ -63,16 +61,16 @@ export default function DrawingTools() {
       const measurements: any = {};
 
       try {
-        if (featureType === 'Polyline') {
+        if (featureType === "Polyline") {
           const line = turf.lineString(geoJSON.geometry.coordinates);
-          const lengthKm = turf.length(line, { units: 'kilometers' });
+          const lengthKm = turf.length(line, { units: "kilometers" });
           measurements.distance = {
             km: lengthKm,
             miles: lengthKm * 0.621371,
             meters: lengthKm * 1000,
             feet: lengthKm * 3280.84,
           };
-        } else if (featureType === 'Polygon' || featureType === 'Rectangle') {
+        } else if (featureType === "Polygon" || featureType === "Rectangle") {
           const polygon = turf.polygon(geoJSON.geometry.coordinates);
           const areaSqm = turf.area(polygon);
           measurements.area = {
@@ -84,7 +82,7 @@ export default function DrawingTools() {
           };
         }
       } catch (error) {
-        console.error('Failed to calculate measurements:', error);
+        console.error("Failed to calculate measurements:", error);
       }
 
       return measurements;
@@ -102,28 +100,28 @@ export default function DrawingTools() {
         // Determine feature type
         let featureType: FeatureType;
         switch (shape) {
-          case 'Marker':
-            featureType = 'Marker';
+          case "Marker":
+            featureType = "Marker";
             break;
-          case 'Line':
-            featureType = 'Polyline';
+          case "Line":
+            featureType = "Polyline";
             break;
-          case 'Polygon':
-            featureType = 'Polygon';
+          case "Polygon":
+            featureType = "Polygon";
             break;
-          case 'Rectangle':
-            featureType = 'Rectangle';
+          case "Rectangle":
+            featureType = "Rectangle";
             break;
           default:
-            featureType = 'Polygon';
+            featureType = "Polygon";
         }
 
         // Get layer style
         const style = {
-          color: (layer.options as any).color || '#3388ff',
+          color: (layer.options as any).color || "#3388ff",
           weight: (layer.options as any).weight || 4,
           opacity: (layer.options as any).opacity || 0.8,
-          fillColor: (layer.options as any).fillColor || '#3388ff',
+          fillColor: (layer.options as any).fillColor || "#3388ff",
           fillOpacity: (layer.options as any).fillOpacity || 0.3,
         };
 
@@ -142,9 +140,9 @@ export default function DrawingTools() {
         // Remove the temporary drawing layer - it will be re-rendered by the features useEffect
         leafletMap.removeLayer(layer);
 
-        console.log('Feature created:', featureType, measurements);
+        console.log("Feature created:", featureType, measurements);
       } catch (error) {
-        console.error('Failed to create feature:', error);
+        console.error("Failed to create feature:", error);
         // Remove layer on error
         leafletMap.removeLayer(layer);
       }
@@ -154,9 +152,16 @@ export default function DrawingTools() {
     const handleEdit = async (e: any) => {
       const layer = e.layer;
       const featureId = (layer as any).featureId;
+      const isLocked = (layer as any).isLocked;
 
       if (!featureId) {
-        console.warn('No feature ID found on edited layer');
+        console.warn("No feature ID found on edited layer");
+        return;
+      }
+
+      // Prevent editing locked features
+      if (isLocked) {
+        console.warn("Cannot edit locked feature:", featureId);
         return;
       }
 
@@ -166,10 +171,10 @@ export default function DrawingTools() {
 
         // Get layer style
         const style = {
-          color: (layer.options as any).color || '#3388ff',
+          color: (layer.options as any).color || "#3388ff",
           weight: (layer.options as any).weight || 4,
           opacity: (layer.options as any).opacity || 0.8,
-          fillColor: (layer.options as any).fillColor || '#3388ff',
+          fillColor: (layer.options as any).fillColor || "#3388ff",
           fillOpacity: (layer.options as any).fillOpacity || 0.3,
         };
 
@@ -179,9 +184,9 @@ export default function DrawingTools() {
           style,
         });
 
-        console.log('Feature updated:', featureId);
+        console.log("Feature updated:", featureId);
       } catch (error) {
-        console.error('Failed to update feature:', error);
+        console.error("Failed to update feature:", error);
       }
     };
 
@@ -189,9 +194,19 @@ export default function DrawingTools() {
     const handleRemove = async (e: any) => {
       const layer = e.layer;
       const featureId = (layer as any).featureId;
+      const isLocked = (layer as any).isLocked;
 
       if (!featureId) {
-        console.warn('No feature ID found on removed layer');
+        console.warn("No feature ID found on removed layer");
+        return;
+      }
+
+      // Prevent deleting locked features
+      if (isLocked) {
+        console.warn("Cannot delete locked feature:", featureId);
+        alert("This feature is locked. Unlock it first to delete.");
+        // Re-add the layer since PM removes it
+        leafletMap.addLayer(layer);
         return;
       }
 
@@ -202,31 +217,31 @@ export default function DrawingTools() {
         // Remove from layers ref
         layersRef.current.delete(featureId);
 
-        console.log('Feature deleted:', featureId);
+        console.log("Feature deleted:", featureId);
       } catch (error) {
-        console.error('Failed to delete feature:', error);
+        console.error("Failed to delete feature:", error);
         // Re-add layer on error
         leafletMap.addLayer(layer);
       }
     };
 
     // Register event listeners
-    leafletMap.on('pm:create', handleCreate);
-    leafletMap.on('pm:edit', handleEdit);
-    leafletMap.on('pm:remove', handleRemove);
+    leafletMap.on("pm:create", handleCreate);
+    leafletMap.on("pm:edit", handleEdit);
+    leafletMap.on("pm:remove", handleRemove);
 
     // Cleanup
     return () => {
       leafletMap.pm.removeControls();
-      leafletMap.off('pm:create', handleCreate);
-      leafletMap.off('pm:edit', handleEdit);
-      leafletMap.off('pm:remove', handleRemove);
+      leafletMap.off("pm:create", handleCreate);
+      leafletMap.off("pm:edit", handleEdit);
+      leafletMap.off("pm:remove", handleRemove);
     };
   }, [leafletMap, createFeature, updateFeature, deleteFeature]);
 
   // Render features on map
   useEffect(() => {
-    if (!leafletMap || !currentProject) return;
+    if (!leafletMap || !selectedLayerId) return;
 
     // Clear existing layers
     layersRef.current.forEach((layer) => {
@@ -240,24 +255,24 @@ export default function DrawingTools() {
         // Create GeoJSON layer
         const geoJsonLayer = L.geoJSON(
           {
-            type: 'Feature',
-            geometry: feature.geometry,
+            type: "Feature",
+            geometry: feature.geometry as any,
             properties: feature.properties || {},
-          },
+          } as GeoJSON.Feature,
           {
-            style: (geoJsonFeature) => {
+            style: () => {
               return {
-                color: feature.style?.color || '#3388ff',
+                color: feature.style?.color || "#3388ff",
                 weight: feature.style?.weight || 4,
                 opacity: feature.style?.opacity || 0.8,
-                fillColor: feature.style?.fillColor || '#3388ff',
+                fillColor: feature.style?.fillColor || "#3388ff",
                 fillOpacity: feature.style?.fillOpacity || 0.3,
               };
             },
-            pointToLayer: (geoJsonPoint, latlng) => {
+            pointToLayer: (_geoJsonPoint, latlng) => {
               return L.marker(latlng);
             },
-          }
+          },
         );
 
         // Add to map
@@ -268,19 +283,37 @@ export default function DrawingTools() {
         if (layers.length > 0) {
           const layer = layers[0];
 
-          // Store feature ID on layer for editing/deletion
+          // Store feature ID and locked status on layer
           (layer as any).featureId = feature.id;
+          (layer as any).isLocked = feature.locked;
 
-          // Enable Leaflet.PM editing on this layer
+          // Enable/disable Leaflet.PM editing based on locked status
           if (layer.pm) {
-            layer.pm.enable();
+            if (feature.locked) {
+              layer.pm.disable();
+              // Add visual indication that feature is locked
+              if ("setStyle" in layer) {
+                const currentStyle = (layer as any).options;
+                (layer as any).setStyle({
+                  ...currentStyle,
+                  opacity: currentStyle.opacity * 0.7,
+                  fillOpacity: currentStyle.fillOpacity * 0.7,
+                });
+              }
+            } else {
+              layer.pm.enable();
+            }
           }
 
           // Store layer reference
           layersRef.current.set(feature.id, layer);
 
           // Build tooltip content with name and measurements
-          let tooltipContent = feature.name || 'Unnamed Feature';
+          let tooltipContent = feature.name || "Unnamed Feature";
+
+          if (feature.locked) {
+            tooltipContent += " 🔒";
+          }
 
           if (feature.properties) {
             if (feature.properties.distance) {
@@ -296,11 +329,11 @@ export default function DrawingTools() {
           // Add tooltip
           layer.bindTooltip(tooltipContent, {
             permanent: false,
-            direction: 'top',
+            direction: "top",
           });
         }
       } catch (error) {
-        console.error('Failed to render feature:', feature.id, error);
+        console.error("Failed to render feature:", feature.id, error);
       }
     });
 
@@ -313,7 +346,37 @@ export default function DrawingTools() {
       });
       layersRef.current.clear();
     };
-  }, [leafletMap, features, currentProject]);
+  }, [leafletMap, features, selectedLayerId]);
+
+  // Add this after your existing useEffect hooks
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && leafletMap) {
+        // Disable all active PM drawing/editing modes
+        if (leafletMap.pm.globalDrawModeEnabled()) {
+          leafletMap.pm.disableDraw();
+        }
+
+        if (leafletMap.pm.globalEditModeEnabled()) {
+          leafletMap.pm.disableGlobalEditMode();
+        }
+
+        if (leafletMap.pm.globalDragModeEnabled()) {
+          leafletMap.pm.disableGlobalDragMode();
+        }
+
+        if (leafletMap.pm.globalRemovalModeEnabled()) {
+          leafletMap.pm.disableGlobalRemovalMode();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [leafletMap]);
 
   return null;
 }

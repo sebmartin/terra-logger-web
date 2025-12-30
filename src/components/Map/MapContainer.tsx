@@ -1,19 +1,26 @@
-import { useEffect, useRef } from 'react';
-import { MapContainer as LeafletMapContainer, TileLayer, useMap as useLeafletMap } from 'react-leaflet';
-import L from 'leaflet';
-import { useMap } from '../../context/MapContext';
-import DrawingTools from './DrawingTools';
-import 'leaflet/dist/leaflet.css';
-import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
+import { useEffect, useRef } from "react";
+import {
+  MapContainer as LeafletMapContainer,
+  TileLayer,
+  useMap as useLeafletMap,
+} from "react-leaflet";
+import L from "leaflet";
+import { useMap } from "../../context/MapContext";
+import DrawingTools from "./DrawingTools";
+import "leaflet/dist/leaflet.css";
+import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
 
-const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '';
+const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || "";
 
 // Fix for default marker icons in Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
 function MapController() {
@@ -33,15 +40,15 @@ function MapController() {
         });
       };
 
-      leafletMap.on('moveend', handleMoveEnd);
-      leafletMap.on('zoomend', handleMoveEnd);
+      leafletMap.on("moveend", handleMoveEnd);
+      leafletMap.on("zoomend", handleMoveEnd);
 
       // Initial state
       handleMoveEnd();
 
       return () => {
-        leafletMap.off('moveend', handleMoveEnd);
-        leafletMap.off('zoomend', handleMoveEnd);
+        leafletMap.off("moveend", handleMoveEnd);
+        leafletMap.off("zoomend", handleMoveEnd);
       };
     }
   }, [leafletMap, setMap, updateMapState]);
@@ -58,20 +65,31 @@ export default function MapComponent() {
 
   if (!MAPBOX_ACCESS_TOKEN) {
     return (
-      <div style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f0f0f0',
-        padding: '20px',
-        textAlign: 'center',
-      }}>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#f0f0f0",
+          padding: "20px",
+          textAlign: "center",
+        }}
+      >
         <div>
           <h2>Mapbox Token Required</h2>
           <p>Please set your VITE_MAPBOX_ACCESS_TOKEN in a .env file</p>
-          <p>Get a free token at: <a href="https://account.mapbox.com/access-tokens/" target="_blank" rel="noopener noreferrer">mapbox.com</a></p>
+          <p>
+            Get a free token at:{" "}
+            <a
+              href="https://account.mapbox.com/access-tokens/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              mapbox.com
+            </a>
+          </p>
         </div>
       </div>
     );
@@ -82,7 +100,7 @@ export default function MapComponent() {
       ref={mapRef}
       center={defaultCenter}
       zoom={defaultZoom}
-      style={{ width: '100%', height: '100%' }}
+      style={{ width: "100%", height: "100%" }}
       zoomControl={true}
       preferCanvas={true}
     >
