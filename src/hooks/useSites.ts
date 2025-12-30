@@ -129,18 +129,3 @@ export function useSites() {
     refreshSiteLayers: loadSiteLayers,
   };
 }
-
-  return {
-    sites,
-    currentSite,
-    setCurrentSite,
-    siteLayers,
-    loading,
-    error,
-    createSite,
-    updateSite,
-    deleteSite,
-    refreshSites: loadSites,
-    refreshSiteLayers: loadSiteLayers,
-  };
-}
