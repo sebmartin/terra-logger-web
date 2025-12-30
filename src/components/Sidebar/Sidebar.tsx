@@ -1,9 +1,7 @@
 import { useEffect } from "react";
-import { useSites } from "../../hooks/useSites";
-import { useLayers } from "../../hooks/useLayers";
+import { useSiteContext } from "../../context/SiteContext";
 import { useLayerContext } from "../../context/LayerContext";
 import { useFeatureContext } from "../../context/FeatureContext";
-import { useFeatures } from "../../hooks/useFeatures";
 import { useMap } from "../../context/MapContext";
 import SiteList from "./sites/SiteList";
 import LayerList from "./layers/LayerList";
@@ -20,17 +18,19 @@ export default function Sidebar() {
     createSite,
     updateSite,
     deleteSite,
-    refreshSiteLayers,
-  } = useSites();
-  const { createLayer, deleteLayer } = useLayers();
+    loadSiteLayers,
+  } = useSiteContext();
+
   const {
     setLayers,
     toggleLayerVisibility,
     selectedLayerId,
     setSelectedLayerId,
+    createLayer,
+    deleteLayer,
   } = useLayerContext();
-  const { features } = useFeatureContext();
-  const { updateFeature } = useFeatures();
+
+  const { features, updateFeature } = useFeatureContext();
   const { map } = useMap();
 
   // Update layers in LayerContext when siteLayers change
@@ -90,7 +90,7 @@ export default function Sidebar() {
             onToggleVisibility={toggleLayerVisibility}
             onCreateLayer={createLayer}
             onDeleteLayer={deleteLayer}
-            onRefreshLayers={refreshSiteLayers}
+            onRefreshLayers={() => currentSite && loadSiteLayers(currentSite.id)}
           />
 
           <FeatureList features={features} onUpdateFeature={updateFeature} />

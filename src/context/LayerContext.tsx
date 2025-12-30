@@ -1,7 +1,7 @@
 /**
  * Layer Context Provider
- * Manages layer state and visibility
- * Feature management moved to FeatureContext for better separation of concerns
+ * Manages layer state and operations
+ * Handles persistence via LayerService
  */
 
 import {
@@ -13,16 +13,23 @@ import {
   ReactNode,
   useEffect,
 } from "react";
-import type { Layer } from "../types/layer";
+import type { Layer, NewLayer, LayerUpdate } from "../types/layer";
 import { layerService } from "../services/LayerService";
 
 interface LayerContextType {
+  // State
   layers: Layer[];
-  setLayers: (layers: Layer[]) => void;
   visibleLayerIds: Set<string>;
-  toggleLayerVisibility: (layerId: string) => Promise<void>;
   selectedLayerId: string | null;
+
+  // Operations
+  setLayers: (layers: Layer[]) => void;
   setSelectedLayerId: (layerId: string | null) => void;
+  toggleLayerVisibility: (layerId: string) => Promise<void>;
+  createLayer: (layerData: NewLayer) => Promise<Layer>;
+  updateLayer: (id: string, updates: LayerUpdate) => Promise<Layer>;
+  deleteLayer: (id: string) => Promise<void>;
+  getLayer: (id: string) => Promise<Layer | null>;
 }
 
 const LayerContext = createContext<LayerContextType | undefined>(undefined);
@@ -63,6 +70,51 @@ export function LayerProvider({ children }: { children: ReactNode }) {
     [layers],
   );
 
+  const createLayer = useCallback(async (layerData: NewLayer): Promise<Layer> => {
+    try {
+      const created = await layerService.create(layerData);
+      setLayers((prev) => [created, ...prev]);
+      return created;
+    } catch (err) {
+      console.error("Failed to create layer:", err);
+      throw err;
+    }
+  }, []);
+
+  const updateLayer = useCallback(async (id: string, updates: LayerUpdate): Promise<Layer> => {
+    try {
+      const updated = await layerService.update(id, updates);
+      setLayers((prev) => prev.map((l) => (l.id === id ? updated : l)));
+      return updated;
+    } catch (err) {
+      console.error("Failed to update layer:", err);
+      throw err;
+    }
+  }, []);
+
+  const deleteLayer = useCallback(async (id: string): Promise<void> => {
+    try {
+      await layerService.delete(id);
+      setLayers((prev) => prev.filter((l) => l.id !== id));
+      // Clear selection if deleted layer was selected
+      if (selectedLayerId === id) {
+        setSelectedLayerId(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete layer:", err);
+      throw err;
+    }
+  }, [selectedLayerId]);
+
+  const getLayer = useCallback(async (id: string): Promise<Layer | null> => {
+    try {
+      return await layerService.get(id);
+    } catch (err) {
+      console.error("Failed to get layer:", err);
+      return null;
+    }
+  }, []);
+
   // Update visible layer IDs when layers change
   useEffect(() => {
     const visible = new Set(layers.filter((l) => l.visible).map((l) => l.id));
@@ -72,13 +124,26 @@ export function LayerProvider({ children }: { children: ReactNode }) {
   const value: LayerContextType = useMemo(
     () => ({
       layers,
-      setLayers,
       visibleLayerIds,
-      toggleLayerVisibility,
       selectedLayerId,
+      setLayers,
       setSelectedLayerId,
+      toggleLayerVisibility,
+      createLayer,
+      updateLayer,
+      deleteLayer,
+      getLayer,
     }),
-    [layers, visibleLayerIds, toggleLayerVisibility, selectedLayerId],
+    [
+      layers,
+      visibleLayerIds,
+      selectedLayerId,
+      toggleLayerVisibility,
+      createLayer,
+      updateLayer,
+      deleteLayer,
+      getLayer,
+    ],
   );
 
   return (

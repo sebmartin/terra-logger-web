@@ -7,13 +7,13 @@
 import { useEffect } from "react";
 import { useMap as useLeafletMap } from "react-leaflet";
 import "@geoman-io/leaflet-geoman-free";
-import { useFeatures } from "../../hooks/useFeatures";
+import { useFeatureContext } from "../../context/FeatureContext";
 import { useLayerContext } from "../../context/LayerContext";
 import type { FeatureType } from "../../types/feature";
 
 export default function MapInteractions() {
   const leafletMap = useLeafletMap();
-  const { createFeature, updateFeature, deleteFeature } = useFeatures();
+  const { createFeature, updateFeature, deleteFeature } = useFeatureContext();
   const { selectedLayerId } = useLayerContext();
 
   useEffect(() => {
