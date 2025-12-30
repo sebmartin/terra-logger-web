@@ -2,11 +2,10 @@ import { useEffect, useRef } from "react";
 import {
   MapContainer as LeafletMapContainer,
   TileLayer,
-  useMap as useLeafletMap,
 } from "react-leaflet";
 import L from "leaflet";
 import { useMap } from "../../context/MapContext";
-import DrawingTools from "./DrawingTools";
+import MapBridge from "./MapBridge";
 import "leaflet/dist/leaflet.css";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
 
@@ -22,39 +21,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
-
-function MapController() {
-  const leafletMap = useLeafletMap();
-  const { setMap, updateMapState } = useMap();
-
-  useEffect(() => {
-    if (leafletMap) {
-      setMap(leafletMap);
-
-      // Update map state on move/zoom
-      const handleMoveEnd = () => {
-        updateMapState({
-          center: leafletMap.getCenter(),
-          zoom: leafletMap.getZoom(),
-          bounds: leafletMap.getBounds(),
-        });
-      };
-
-      leafletMap.on("moveend", handleMoveEnd);
-      leafletMap.on("zoomend", handleMoveEnd);
-
-      // Initial state
-      handleMoveEnd();
-
-      return () => {
-        leafletMap.off("moveend", handleMoveEnd);
-        leafletMap.off("zoomend", handleMoveEnd);
-      };
-    }
-  }, [leafletMap, setMap, updateMapState]);
-
-  return <DrawingTools />;
-}
 
 export default function MapComponent() {
   const mapRef = useRef(null);
@@ -111,7 +77,7 @@ export default function MapComponent() {
         zoomOffset={-1}
         maxZoom={19}
       />
-      <MapController />
+      <MapBridge />
     </LeafletMapContainer>
   );
 }

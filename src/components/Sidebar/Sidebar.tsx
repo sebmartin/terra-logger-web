@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useSites } from "../../hooks/useSites";
 import { useLayers } from "../../hooks/useLayers";
-import { useLayer } from "../../context/LayerContext";
+import { useLayerContext } from "../../context/LayerContext";
+import { useFeatureContext } from "../../context/FeatureContext";
 import { useFeatures } from "../../hooks/useFeatures";
 import { useMap } from "../../context/MapContext";
 import SiteList from "./sites/SiteList";
@@ -27,8 +28,8 @@ export default function Sidebar() {
     toggleLayerVisibility,
     selectedLayerId,
     setSelectedLayerId,
-    features,
-  } = useLayer();
+  } = useLayerContext();
+  const { features } = useFeatureContext();
   const { updateFeature } = useFeatures();
   const { map } = useMap();
 

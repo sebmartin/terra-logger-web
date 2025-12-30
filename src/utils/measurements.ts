@@ -39,7 +39,7 @@ export function calculateMeasurements(
     if (featureType === "Polyline") {
       const line = turf.lineString(geoJSON.geometry.coordinates);
       const lengthKm = turf.length(line, { units: "kilometers" });
-      
+
       measurements.distance = {
         km: lengthKm,
         miles: lengthKm * 0.621371,
@@ -49,7 +49,7 @@ export function calculateMeasurements(
     } else if (featureType === "Polygon" || featureType === "Rectangle") {
       const polygon = turf.polygon(geoJSON.geometry.coordinates);
       const areaSqm = turf.area(polygon);
-      
+
       measurements.area = {
         sqm: areaSqm,
         sqkm: areaSqm / 1_000_000,
