@@ -1,10 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import {
   MapContainer as LeafletMapContainer,
   TileLayer,
 } from "react-leaflet";
 import L from "leaflet";
-import { useMap } from "../../context/MapContext";
 import MapBridge from "./MapBridge";
 import "leaflet/dist/leaflet.css";
 import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";

@@ -1,13 +1,10 @@
-import type { Feature } from "../../../types/feature";
+import type { Feature, FeatureUpdate } from "../../../types/feature";
 import CollapsibleSection from "../CollapsibleSection";
 import FeatureItem from "./FeatureItem";
 
 interface FeatureListProps {
   features: Feature[];
-  onUpdateFeature: (
-    featureId: string,
-    data: { locked: boolean },
-  ) => Promise<void>;
+  onUpdateFeature: (featureId: string, data: FeatureUpdate) => Promise<Feature>;
 }
 
 export default function FeatureList({

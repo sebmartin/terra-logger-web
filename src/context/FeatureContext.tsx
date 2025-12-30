@@ -11,7 +11,6 @@ import {
   useMemo,
   useCallback,
   ReactNode,
-  useEffect,
 } from "react";
 import type { Feature } from "../types/feature";
 

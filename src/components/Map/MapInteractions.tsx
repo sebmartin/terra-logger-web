@@ -9,7 +9,6 @@ import { useMap as useLeafletMap } from "react-leaflet";
 import "@geoman-io/leaflet-geoman-free";
 import { useFeatures } from "../../hooks/useFeatures";
 import { useLayerContext } from "../../context/LayerContext";
-import { featureService } from "../../services/FeatureService";
 import type { FeatureType } from "../../types/feature";
 
 export default function MapInteractions() {

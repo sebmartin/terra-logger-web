@@ -16,7 +16,7 @@ interface SiteListProps {
     description: string;
     bounds: SiteBounds;
   }) => Promise<Site>;
-  onUpdateSite: (id: string, data: { bounds: SiteBounds }) => Promise<void>;
+  onUpdateSite: (id: string, data: { bounds: SiteBounds }) => Promise<Site>;
   onDeleteSite: (id: string) => Promise<void>;
 }
 
