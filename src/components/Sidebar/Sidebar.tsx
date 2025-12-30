@@ -13,16 +13,15 @@ export default function Sidebar() {
     sites,
     currentSite,
     setCurrentSite,
-    siteLayers,
     loading,
     createSite,
     updateSite,
     deleteSite,
-    loadSiteLayers,
   } = useSiteContext();
 
   const {
-    setLayers,
+    layers,
+    loadLayersForSite,
     toggleLayerVisibility,
     selectedLayerId,
     setSelectedLayerId,
@@ -33,15 +32,14 @@ export default function Sidebar() {
   const { features, updateFeature } = useFeatureContext();
   const { map } = useMap();
 
-  // Update layers in LayerContext when siteLayers change
+  // Load layers when current site changes
   useEffect(() => {
-    setLayers(siteLayers);
-  }, [siteLayers, setLayers]);
-
-  // When site changes, clear layer selection
-  useEffect(() => {
+    if (currentSite) {
+      loadLayersForSite(currentSite.id);
+    }
+    // Clear layer selection when site changes
     setSelectedLayerId(null);
-  }, [currentSite, setSelectedLayerId]);
+  }, [currentSite, loadLayersForSite, setSelectedLayerId]);
 
   // Navigate to site bounds when site is selected
   useEffect(() => {
@@ -83,14 +81,14 @@ export default function Sidebar() {
       {currentSite && (
         <>
           <LayerList
-            layers={siteLayers}
+            layers={layers}
             selectedLayerId={selectedLayerId}
             siteId={currentSite.id}
             onSelectLayer={setSelectedLayerId}
             onToggleVisibility={toggleLayerVisibility}
             onCreateLayer={createLayer}
             onDeleteLayer={deleteLayer}
-            onRefreshLayers={() => currentSite && loadSiteLayers(currentSite.id)}
+            onRefreshLayers={() => currentSite && loadLayersForSite(currentSite.id)}
           />
 
           <FeatureList features={features} onUpdateFeature={updateFeature} />

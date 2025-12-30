@@ -14,22 +14,18 @@ import {
   useEffect,
 } from "react";
 import type { Site, NewSite, SiteUpdate } from "../types/site";
-import type { Layer } from "../types/layer";
 import { siteService } from "../services/SiteService";
-import { layerService } from "../services/LayerService";
 
 interface SiteContextType {
   // State
   currentSite: Site | null;
   sites: Site[];
-  siteLayers: Layer[];
   loading: boolean;
   error: Error | null;
 
   // Operations
   setCurrentSite: (site: Site | null) => void;
   loadSites: () => Promise<void>;
-  loadSiteLayers: (siteId: string) => Promise<void>;
   createSite: (siteData: NewSite) => Promise<Site>;
   updateSite: (id: string, updates: SiteUpdate) => Promise<Site>;
   deleteSite: (id: string) => Promise<void>;
@@ -40,7 +36,6 @@ const SiteContext = createContext<SiteContextType | undefined>(undefined);
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [currentSite, setCurrentSite] = useState<Site | null>(null);
   const [sites, setSites] = useState<Site[]>([]);
-  const [siteLayers, setSiteLayers] = useState<Layer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -56,16 +51,6 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       setError(err as Error);
     } finally {
       setLoading(false);
-    }
-  }, []);
-
-  // Load layers for a specific site
-  const loadSiteLayers = useCallback(async (siteId: string) => {
-    try {
-      const layers = await layerService.listForSite(siteId);
-      setSiteLayers(layers);
-    } catch (err) {
-      console.error("Failed to load site layers:", err);
     }
   }, []);
 
@@ -117,25 +102,14 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     loadSites();
   }, [loadSites]);
 
-  // Load layers when current site changes
-  useEffect(() => {
-    if (currentSite) {
-      loadSiteLayers(currentSite.id);
-    } else {
-      setSiteLayers([]);
-    }
-  }, [currentSite, loadSiteLayers]);
-
   const value: SiteContextType = useMemo(
     () => ({
       currentSite,
       sites,
-      siteLayers,
       loading,
       error,
       setCurrentSite,
       loadSites,
-      loadSiteLayers,
       createSite,
       updateSite,
       deleteSite,
@@ -143,11 +117,9 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     [
       currentSite,
       sites,
-      siteLayers,
       loading,
       error,
       loadSites,
-      loadSiteLayers,
       createSite,
       updateSite,
       deleteSite,
