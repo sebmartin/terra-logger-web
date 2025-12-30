@@ -25,15 +25,17 @@ export default function SiteItem({
       <div className="site-info">
         <div className="site-name">
           {site.name}
-          <IconButton
-            variant="action"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditBounds(site);
-            }}
-            title="Edit Bounds"
-            icon={<Pencil size={12} />}
-          />
+          {isActive && (
+            <IconButton
+              variant="action"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditBounds(site);
+              }}
+              title="Edit Bounds"
+              icon={<Pencil size={12} />}
+            />
+          )}
         </div>
         <div className="site-meta">
           {new Date(site.updated_at).toLocaleDateString()}

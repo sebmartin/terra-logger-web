@@ -21,16 +21,15 @@ export default function DrawingTools() {
     // Add Leaflet.PM controls
     leafletMap.pm.addControls({
       position: "topleft",
-      drawMarker: true,
-      drawPolyline: true,
-      drawPolygon: true,
-      drawRectangle: true,
-      drawCircle: false,
-      drawCircleMarker: false,
-      editMode: true,
-      dragMode: true,
-      cutPolygon: false,
-      removalMode: true,
+      drawText: !!selectedLayerId,
+      drawMarker: !!selectedLayerId,
+      drawPolyline: !!selectedLayerId,
+      drawPolygon: !!selectedLayerId,
+      drawRectangle: !!selectedLayerId,
+      editMode: !!selectedLayerId,
+      dragMode: !!selectedLayerId,
+      removalMode: !!selectedLayerId,
+      rotateMode: !!selectedLayerId
     });
 
     // Configure global options
@@ -348,7 +347,7 @@ export default function DrawingTools() {
     };
   }, [leafletMap, features, selectedLayerId]);
 
-  // Add this after your existing useEffect hooks
+  // Handle Escape key to cancel drawing/editing
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && leafletMap) {

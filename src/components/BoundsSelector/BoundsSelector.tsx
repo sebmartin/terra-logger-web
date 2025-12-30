@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useMap } from "../../context/MapContext";
 import type { SiteBounds } from "../../types/site";
 import "./BoundsSelector.css";
@@ -62,7 +63,7 @@ export default function BoundsSelector({
     }
   };
 
-  return (
+  return createPortal(
     <div className="bounds-selector-overlay">
       <div className="bounds-selector-frame">
         <div className="bounds-selector-border bounds-top" />
@@ -118,6 +119,7 @@ export default function BoundsSelector({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
