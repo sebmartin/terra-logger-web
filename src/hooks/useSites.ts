@@ -1,5 +1,12 @@
+/**
+ * Hook for site operations
+ * Uses SiteService and LayerService for all API interactions
+ */
+
 import { useState, useEffect, useCallback } from "react";
 import { useSiteContext } from "../context/SiteContext";
+import { siteService } from "../services/SiteService";
+import { layerService } from "../services/LayerService";
 import type { NewSite, SiteUpdate } from "../types/site";
 
 export function useSites() {
@@ -19,16 +26,8 @@ export function useSites() {
     setLoading(true);
     setError(null);
     try {
-      const loadedSites = await window.electron.listSites();
-      // Parse JSON fields
-      const parsed = loadedSites.map((site: any) => ({
-        ...site,
-        bounds:
-          typeof site.bounds === "string"
-            ? JSON.parse(site.bounds)
-            : site.bounds,
-      }));
-      setSites(parsed);
+      const loadedSites = await siteService.list();
+      setSites(loadedSites);
     } catch (err) {
       console.error("Failed to load sites:", err);
       setError(err as Error);
@@ -41,13 +40,8 @@ export function useSites() {
   const loadSiteLayers = useCallback(
     async (siteId: string) => {
       try {
-        const layers = await window.electron.listSiteLayers(siteId);
-        // Parse visible field from SQLite integer to boolean
-        const parsed = layers.map((layer: any) => ({
-          ...layer,
-          visible: Boolean(layer.visible),
-        }));
-        setSiteLayers(parsed);
+        const layers = await layerService.listForSite(siteId);
+        setSiteLayers(layers);
       } catch (err) {
         console.error("Failed to load site layers:", err);
       }
@@ -59,16 +53,9 @@ export function useSites() {
   const createSite = useCallback(
     async (siteData: NewSite) => {
       try {
-        const created = await window.electron.createSite(siteData);
-        const parsed = {
-          ...created,
-          bounds:
-            typeof created.bounds === "string"
-              ? JSON.parse(created.bounds)
-              : created.bounds,
-        };
-        setSites((prev) => [parsed, ...prev]);
-        return parsed;
+        const created = await siteService.create(siteData);
+        setSites((prev) => [created, ...prev]);
+        return created;
       } catch (err) {
         console.error("Failed to create site:", err);
         throw err;
@@ -81,21 +68,14 @@ export function useSites() {
   const updateSite = useCallback(
     async (id: string, updates: SiteUpdate) => {
       try {
-        const updated = await window.electron.updateSite(id, updates);
-        const parsed = {
-          ...updated,
-          bounds:
-            typeof updated.bounds === "string"
-              ? JSON.parse(updated.bounds)
-              : updated.bounds,
-        };
+        const updated = await siteService.update(id, updates);
         setSites((prev) =>
-          prev.map((site) => (site.id === id ? parsed : site)),
+          prev.map((site) => (site.id === id ? updated : site)),
         );
         if (currentSite?.id === id) {
-          setCurrentSite(parsed);
+          setCurrentSite(updated);
         }
-        return parsed;
+        return updated;
       } catch (err) {
         console.error("Failed to update site:", err);
         throw err;
@@ -108,7 +88,7 @@ export function useSites() {
   const deleteSite = useCallback(
     async (id: string) => {
       try {
-        await window.electron.deleteSite(id);
+        await siteService.delete(id);
         setSites((prev) => prev.filter((site) => site.id !== id));
         if (currentSite?.id === id) {
           setCurrentSite(null);
@@ -134,6 +114,21 @@ export function useSites() {
       setSiteLayers([]);
     }
   }, [currentSite, loadSiteLayers, setSiteLayers]);
+
+  return {
+    sites,
+    currentSite,
+    setCurrentSite,
+    siteLayers,
+    loading,
+    error,
+    createSite,
+    updateSite,
+    deleteSite,
+    refreshSites: loadSites,
+    refreshSiteLayers: loadSiteLayers,
+  };
+}
 
   return {
     sites,

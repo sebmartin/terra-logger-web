@@ -1,4 +1,10 @@
-import { useState, useEffect } from "react";
+/**
+ * Hook for layer operations
+ * Uses LayerService for all API interactions
+ */
+
+import { useState, useEffect, useCallback } from "react";
+import { layerService } from "../services/LayerService";
 import type { Layer, NewLayer, LayerUpdate } from "../types/layer";
 
 export function useLayers() {
@@ -6,38 +12,29 @@ export function useLayers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadLayers();
-  }, []);
-
-  const loadLayers = async () => {
+  const loadLayers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await window.electron.listLayers();
-      // Parse and convert visible field from SQLite integer to boolean
-      const parsedLayers = data.map((l: any) => ({
-        ...l,
-        visible: Boolean(l.visible),
-      }));
-      setLayers(parsedLayers);
+      const data = await layerService.list();
+      setLayers(data);
     } catch (err) {
       console.error("Failed to load layers:", err);
       setError("Failed to load layers");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadLayers();
+  }, [loadLayers]);
 
   const createLayer = async (layer: NewLayer): Promise<Layer> => {
     try {
-      const created = await window.electron.createLayer(layer);
-      const parsed = {
-        ...created,
-        visible: Boolean(created.visible),
-      };
-      setLayers((prev) => [parsed, ...prev]);
-      return parsed;
+      const created = await layerService.create(layer);
+      setLayers((prev) => [created, ...prev]);
+      return created;
     } catch (err) {
       console.error("Failed to create layer:", err);
       throw err;
@@ -49,13 +46,9 @@ export function useLayers() {
     updates: LayerUpdate,
   ): Promise<Layer> => {
     try {
-      const updated = await window.electron.updateLayer(id, updates);
-      const parsed = {
-        ...updated,
-        visible: Boolean(updated.visible),
-      };
-      setLayers((prev) => prev.map((l) => (l.id === id ? parsed : l)));
-      return parsed;
+      const updated = await layerService.update(id, updates);
+      setLayers((prev) => prev.map((l) => (l.id === id ? updated : l)));
+      return updated;
     } catch (err) {
       console.error("Failed to update layer:", err);
       throw err;
@@ -64,7 +57,7 @@ export function useLayers() {
 
   const deleteLayer = async (id: string): Promise<void> => {
     try {
-      await window.electron.deleteLayer(id);
+      await layerService.delete(id);
       setLayers((prev) => prev.filter((l) => l.id !== id));
     } catch (err) {
       console.error("Failed to delete layer:", err);
@@ -74,13 +67,7 @@ export function useLayers() {
 
   const getLayer = async (id: string): Promise<Layer | null> => {
     try {
-      const layer = await window.electron.getLayer(id);
-      if (!layer) return null;
-
-      return {
-        ...layer,
-        visible: Boolean(layer.visible),
-      };
+      return await layerService.get(id);
     } catch (err) {
       console.error("Failed to get layer:", err);
       return null;

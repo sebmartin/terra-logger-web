@@ -1,16 +1,60 @@
-import { useCallback } from "react";
-import { useLayer } from "../context/LayerContext";
+/**
+ * Hook for feature operations
+ * Uses FeatureService for all API interactions
+ * Manages feature state through FeatureContext
+ */
+
+import { useCallback, useEffect } from "react";
+import { useLayerContext } from "../context/LayerContext";
+import { useFeatureContext } from "../context/FeatureContext";
+import { featureService } from "../services/FeatureService";
 import type { NewFeature, FeatureUpdate } from "../types/feature";
 
 export function useFeatures() {
+  const { selectedLayerId, visibleLayerIds } = useLayerContext();
   const {
-    selectedLayerId,
     features,
     addFeature,
-    updateFeatureInList,
+    updateFeature: updateFeatureInContext,
     removeFeature,
-  } = useLayer();
+    setFeatures,
+    setIsDirty,
+  } = useFeatureContext();
 
+  /**
+   * Load features from all visible layers
+   */
+  const loadFeatures = useCallback(async () => {
+    if (visibleLayerIds.size === 0) {
+      setFeatures([]);
+      return;
+    }
+
+    try {
+      const allFeatures = [];
+
+      for (const layerId of visibleLayerIds) {
+        const layerFeatures = await featureService.list(layerId);
+        allFeatures.push(...layerFeatures);
+      }
+
+      setFeatures(allFeatures);
+      setIsDirty(false);
+    } catch (error) {
+      console.error("Failed to load features:", error);
+    }
+  }, [visibleLayerIds, setFeatures, setIsDirty]);
+
+  /**
+   * Reload features when visible layers change
+   */
+  useEffect(() => {
+    loadFeatures();
+  }, [loadFeatures]);
+
+  /**
+   * Create a new feature
+   */
   const createFeature = useCallback(
     async (featureData: Omit<NewFeature, "layer_id">) => {
       if (!selectedLayerId) {
@@ -18,33 +62,13 @@ export function useFeatures() {
       }
 
       try {
-        const created = await window.electron.createFeature(selectedLayerId, {
-          ...featureData,
-          layer_id: selectedLayerId,
-        });
+        const created = await featureService.createWithMeasurements(
+          selectedLayerId,
+          featureData,
+        );
 
-        // Parse JSON fields
-        const parsed = {
-          ...created,
-          geometry:
-            typeof created.geometry === "string"
-              ? JSON.parse(created.geometry)
-              : created.geometry,
-          properties: created.properties
-            ? typeof created.properties === "string"
-              ? JSON.parse(created.properties)
-              : created.properties
-            : null,
-          style: created.style
-            ? typeof created.style === "string"
-              ? JSON.parse(created.style)
-              : created.style
-            : null,
-          locked: Boolean(created.locked),
-        };
-
-        addFeature(parsed);
-        return parsed;
+        addFeature(created);
+        return created;
       } catch (error) {
         console.error("Failed to create feature:", error);
         throw error;
@@ -53,45 +77,30 @@ export function useFeatures() {
     [selectedLayerId, addFeature],
   );
 
+  /**
+   * Update an existing feature
+   */
   const updateFeature = useCallback(
     async (id: string, updates: FeatureUpdate) => {
       try {
-        const updated = await window.electron.updateFeature(id, updates);
-
-        // Parse JSON fields
-        const parsed = {
-          ...updated,
-          geometry:
-            typeof updated.geometry === "string"
-              ? JSON.parse(updated.geometry)
-              : updated.geometry,
-          properties: updated.properties
-            ? typeof updated.properties === "string"
-              ? JSON.parse(updated.properties)
-              : updated.properties
-            : null,
-          style: updated.style
-            ? typeof updated.style === "string"
-              ? JSON.parse(updated.style)
-              : updated.style
-            : null,
-          locked: Boolean(updated.locked),
-        };
-
-        updateFeatureInList(id, parsed);
-        return parsed;
+        const updated = await featureService.update(id, updates);
+        updateFeatureInContext(id, updated);
+        return updated;
       } catch (error) {
         console.error("Failed to update feature:", error);
         throw error;
       }
     },
-    [updateFeatureInList],
+    [updateFeatureInContext],
   );
 
+  /**
+   * Delete a feature
+   */
   const deleteFeature = useCallback(
     async (id: string) => {
       try {
-        await window.electron.deleteFeature(id);
+        await featureService.delete(id);
         removeFeature(id);
       } catch (error) {
         console.error("Failed to delete feature:", error);
@@ -106,5 +115,6 @@ export function useFeatures() {
     createFeature,
     updateFeature,
     deleteFeature,
+    loadFeatures,
   };
 }
