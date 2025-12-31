@@ -1,7 +1,7 @@
 /**
  * Site Context Provider
  * Manages site state and operations
- * Handles persistence via SiteService and LayerService
+ * Handles persistence via SiteService
  */
 
 import {
@@ -18,13 +18,13 @@ import { siteService } from "../services/SiteService";
 
 interface SiteContextType {
   // State
-  currentSite: Site | null;
+  selectedSite: Site | null;
   sites: Site[];
   loading: boolean;
   error: Error | null;
 
   // Operations
-  setCurrentSite: (site: Site | null) => void;
+  setSelectedSite: (site: Site | null) => void;
   loadSites: () => Promise<void>;
   createSite: (siteData: NewSite) => Promise<Site>;
   updateSite: (id: string, updates: SiteUpdate) => Promise<Site>;
@@ -34,7 +34,7 @@ interface SiteContextType {
 const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export function SiteProvider({ children }: { children: ReactNode }) {
-  const [currentSite, setCurrentSite] = useState<Site | null>(null);
+  const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [sites, setSites] = useState<Site[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -73,29 +73,29 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       setSites((prev) =>
         prev.map((site) => (site.id === id ? updated : site)),
       );
-      if (currentSite?.id === id) {
-        setCurrentSite(updated);
+      if (selectedSite?.id === id) {
+        setSelectedSite(updated);
       }
       return updated;
     } catch (err) {
       console.error("Failed to update site:", err);
       throw err;
     }
-  }, [currentSite]);
+  }, [selectedSite]);
 
   // Delete a site
   const deleteSite = useCallback(async (id: string) => {
     try {
       await siteService.delete(id);
       setSites((prev) => prev.filter((site) => site.id !== id));
-      if (currentSite?.id === id) {
-        setCurrentSite(null);
+      if (selectedSite?.id === id) {
+        setSelectedSite(null);
       }
     } catch (err) {
       console.error("Failed to delete site:", err);
       throw err;
     }
-  }, [currentSite]);
+  }, [selectedSite]);
 
   // Load sites on mount
   useEffect(() => {
@@ -104,18 +104,18 @@ export function SiteProvider({ children }: { children: ReactNode }) {
 
   const value: SiteContextType = useMemo(
     () => ({
-      currentSite,
+      selectedSite,
       sites,
       loading,
       error,
-      setCurrentSite,
+      setSelectedSite,
       loadSites,
       createSite,
       updateSite,
       deleteSite,
     }),
     [
-      currentSite,
+      selectedSite,
       sites,
       loading,
       error,

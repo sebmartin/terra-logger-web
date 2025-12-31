@@ -1,7 +1,5 @@
 import { useEffect } from "react";
 import { useSiteContext } from "../../context/SiteContext";
-import { useLayerContext } from "../../context/LayerContext";
-import { useFeatureContext } from "../../context/FeatureContext";
 import { useMap } from "../../context/MapContext";
 import SiteList from "./sites/SiteList";
 import LayerList from "./layers/LayerList";
@@ -9,43 +7,15 @@ import FeatureList from "./features/FeatureList";
 import "./Sidebar.css";
 
 export default function Sidebar() {
-  const {
-    sites,
-    currentSite,
-    setCurrentSite,
-    loading,
-    createSite,
-    updateSite,
-    deleteSite,
-  } = useSiteContext();
-
-  const {
-    layers,
-    loadLayersForSite,
-    toggleLayerVisibility,
-    selectedLayerId,
-    setSelectedLayerId,
-    createLayer,
-    deleteLayer,
-  } = useLayerContext();
-
-  const { features, updateFeature } = useFeatureContext();
+  const { selectedSite } = useSiteContext();
   const { map } = useMap();
 
-  // Load layers when current site changes
-  useEffect(() => {
-    if (currentSite) {
-      loadLayersForSite(currentSite.id);
-    }
-    // Clear layer selection when site changes
-    setSelectedLayerId(null);
-  }, [currentSite, loadLayersForSite, setSelectedLayerId]);
-
   // Navigate to site bounds when site is selected
+  // TODO: Move this to the SiteList component?
   useEffect(() => {
     if (!map) return;
 
-    const boundsToShow = currentSite?.bounds;
+    const boundsToShow = selectedSite?.bounds;
 
     if (boundsToShow) {
       map.fitBounds(
@@ -60,7 +30,7 @@ export default function Sidebar() {
         },
       );
     }
-  }, [map, currentSite]);
+  }, [map, selectedSite]);
 
   return (
     <div className="sidebar">
@@ -68,32 +38,9 @@ export default function Sidebar() {
         <h2>Terra Logger</h2>
       </div>
 
-      <SiteList
-        sites={sites}
-        currentSite={currentSite}
-        loading={loading}
-        onSelectSite={setCurrentSite}
-        onCreateSite={createSite}
-        onUpdateSite={updateSite}
-        onDeleteSite={deleteSite}
-      />
-
-      {currentSite && (
-        <>
-          <LayerList
-            layers={layers}
-            selectedLayerId={selectedLayerId}
-            siteId={currentSite.id}
-            onSelectLayer={setSelectedLayerId}
-            onToggleVisibility={toggleLayerVisibility}
-            onCreateLayer={createLayer}
-            onDeleteLayer={deleteLayer}
-            onRefreshLayers={() => currentSite && loadLayersForSite(currentSite.id)}
-          />
-
-          <FeatureList features={features} onUpdateFeature={updateFeature} />
-        </>
-      )}
+      <SiteList />
+      <LayerList />
+      <FeatureList />
     </div>
   );
 }

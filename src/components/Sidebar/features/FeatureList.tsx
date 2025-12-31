@@ -1,19 +1,13 @@
-import type { Feature, FeatureUpdate } from "../../../types/feature";
+import { useFeatureContext } from "@/context/FeatureContext";
 import CollapsibleSection from "../CollapsibleSection";
 import FeatureItem from "./FeatureItem";
 
-interface FeatureListProps {
-  features: Feature[];
-  onUpdateFeature: (featureId: string, data: FeatureUpdate) => Promise<Feature>;
-}
+export default function FeatureList() {
+  const { features, updateFeature } = useFeatureContext();
 
-export default function FeatureList({
-  features,
-  onUpdateFeature,
-}: FeatureListProps) {
   const handleToggleLock = async (featureId: string, currentLocked: boolean) => {
     try {
-      await onUpdateFeature(featureId, { locked: !currentLocked });
+      await updateFeature(featureId, { locked: !currentLocked });
     } catch (error) {
       console.error("Failed to toggle feature lock:", error);
       alert("Failed to toggle feature lock");

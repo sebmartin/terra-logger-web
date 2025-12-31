@@ -1,3 +1,4 @@
+import LeafletIcon from "@/components/common/LeafletIcon";
 import type { Feature } from "../../../types/feature";
 import { ToggleButton } from "../../common";
 
@@ -22,7 +23,10 @@ export default function FeatureItem({
   return (
     <div className="feature-item">
       <div className="feature-info">
-        <div className="feature-type">{feature.type}</div>
+        <div className="feature-type">
+          <LeafletIcon name={feature.type} />
+          <p className="feature-type-text">{feature.type}</p>
+        </div>
         <div className="feature-name">{feature.name || "Unnamed"}</div>
         {measurement && (
           <div className="feature-measurement">{measurement}</div>
@@ -34,6 +38,6 @@ export default function FeatureItem({
         title={feature.locked ? "Locked" : "Unlocked"}
         ariaLabel={feature.locked ? "Unlock feature" : "Lock feature"}
       />
-    </div>
+    </div >
   );
 }

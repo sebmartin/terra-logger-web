@@ -284,14 +284,26 @@
 }
 
 .feature-type {
-  font-size: 11px;
-  font-weight: 600;
   color: #007bff;
   background: #e3f2fd;
   padding: 4px 8px;
   border-radius: 4px;
-  text-transform: uppercase;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-self: flex-start;
+  align-items: center;
+  gap: 6px;
+}
+
+.leaflet-standalone-icon.leaflet-pm-toolbar {
+  margin-top: 0 !important;
+}
+
+.feature-type-text {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .feature-name {

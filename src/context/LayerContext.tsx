@@ -15,6 +15,7 @@ import {
 } from "react";
 import type { Layer, NewLayer, LayerUpdate } from "../types/layer";
 import { layerService } from "../services/LayerService";
+import { useSiteContext } from "./SiteContext";
 
 interface LayerContextType {
   // State
@@ -25,7 +26,7 @@ interface LayerContextType {
   // Operations
   setLayers: (layers: Layer[]) => void;
   setSelectedLayerId: (layerId: string | null) => void;
-  loadLayersForSite: (siteId: string) => Promise<void>;
+  loadLayers: (siteId: string | null) => Promise<void>;
   toggleLayerVisibility: (layerId: string) => Promise<void>;
   createLayer: (layerData: NewLayer) => Promise<Layer>;
   updateLayer: (id: string, updates: LayerUpdate) => Promise<Layer>;
@@ -39,15 +40,22 @@ export function LayerProvider({ children }: { children: ReactNode }) {
   const [layers, setLayers] = useState<Layer[]>([]);
   const [visibleLayerIds, setVisibleLayerIds] = useState<Set<string>>(new Set());
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
+  const { selectedSite } = useSiteContext();
 
-  const loadLayersForSite = useCallback(async (siteId: string) => {
+  const loadLayers = useCallback(async (siteId: string | null = null) => {
+    siteId = siteId || selectedSite?.id || null;
+    if (!siteId) {
+      setLayers([]);
+      return
+    };
+
     try {
       const loadedLayers = await layerService.listForSite(siteId);
       setLayers(loadedLayers);
     } catch (err) {
       console.error("Failed to load layers for site:", err);
     }
-  }, []);
+  }, [selectedSite]);
 
   const toggleLayerVisibility = useCallback(
     async (layerId: string) => {
@@ -125,6 +133,11 @@ export function LayerProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Load layers when selected site changes
+  useEffect(() => {
+    loadLayers();
+  }, [loadLayers]);
+
   // Update visible layer IDs when layers change
   useEffect(() => {
     const visible = new Set(layers.filter((l) => l.visible).map((l) => l.id));
@@ -138,7 +151,7 @@ export function LayerProvider({ children }: { children: ReactNode }) {
       selectedLayerId,
       setLayers,
       setSelectedLayerId,
-      loadLayersForSite,
+      loadLayers,
       toggleLayerVisibility,
       createLayer,
       updateLayer,
@@ -149,7 +162,7 @@ export function LayerProvider({ children }: { children: ReactNode }) {
       layers,
       visibleLayerIds,
       selectedLayerId,
-      loadLayersForSite,
+      loadLayers,
       toggleLayerVisibility,
       createLayer,
       updateLayer,

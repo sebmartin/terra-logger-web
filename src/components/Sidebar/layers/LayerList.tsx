@@ -1,49 +1,39 @@
 import { useState } from "react";
-import type { Layer } from "../../../types/layer";
 import { IconButton } from "../../common";
 import CollapsibleSection from "../CollapsibleSection";
 import LayerItem from "./LayerItem";
 import NewLayerDialog from "./NewLayerDialog";
+import { useLayerContext } from "@/context/LayerContext";
+import { useSiteContext } from "@/context/SiteContext";
 
-interface LayerListProps {
-  layers: Layer[];
-  selectedLayerId: string | null;
-  siteId: string;
-  onSelectLayer: (id: string | null) => void;
-  onToggleVisibility: (id: string) => void;
-  onCreateLayer: (data: {
-    site_id: string;
-    name: string;
-    description: string;
-    visible: boolean;
-  }) => Promise<Layer>;
-  onDeleteLayer: (id: string) => Promise<void>;
-  onRefreshLayers: (siteId: string) => Promise<void>;
-}
-
-export default function LayerList({
-  layers,
-  selectedLayerId,
-  siteId,
-  onSelectLayer,
-  onToggleVisibility,
-  onCreateLayer,
-  onDeleteLayer,
-  onRefreshLayers,
-}: LayerListProps) {
+export default function LayerList() {
   const [showNewLayerDialog, setShowNewLayerDialog] = useState(false);
+  const {
+    layers,
+    toggleLayerVisibility,
+    selectedLayerId,
+    setSelectedLayerId,
+    loadLayers,
+    createLayer,
+    deleteLayer,
+  } = useLayerContext();
+  const { selectedSite } = useSiteContext();
+
+  if (!selectedSite) {
+    return null;
+  }
 
   const handleCreateLayer = async (layerName: string) => {
     try {
-      const layer = await onCreateLayer({
-        site_id: siteId,
+      const layer = await createLayer({
+        site_id: selectedSite.id,
         name: layerName,
         description: "",
         visible: true,
       });
-      onSelectLayer(layer.id);
+      setSelectedLayerId(layer.id);
       setShowNewLayerDialog(false);
-      await onRefreshLayers(siteId);
+      await loadLayers(selectedSite.id);
     } catch (error) {
       console.error("Failed to create layer:", error);
       alert("Failed to create layer");
@@ -53,11 +43,11 @@ export default function LayerList({
   const handleDeleteLayer = async (id: string, name: string) => {
     if (confirm(`Delete layer "${name}" and all its features?`)) {
       try {
-        await onDeleteLayer(id);
+        await deleteLayer(id);
         if (selectedLayerId === id) {
-          onSelectLayer(null);
+          setSelectedLayerId(null);
         }
-        await onRefreshLayers(siteId);
+        await loadLayers(selectedSite.id);
       } catch (error) {
         console.error("Failed to delete layer:", error);
         alert("Failed to delete layer");
@@ -90,8 +80,8 @@ export default function LayerList({
                 key={layer.id}
                 layer={layer}
                 isSelected={selectedLayerId === layer.id}
-                onSelect={onSelectLayer}
-                onToggleVisibility={onToggleVisibility}
+                onSelect={setSelectedLayerId}
+                onToggleVisibility={toggleLayerVisibility}
                 onDelete={handleDeleteLayer}
               />
             ))

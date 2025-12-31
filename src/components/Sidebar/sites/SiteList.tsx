@@ -5,34 +5,23 @@ import CollapsibleSection from "../CollapsibleSection";
 import SiteItem from "./SiteItem";
 import NewSiteDialog from "./NewSiteDialog";
 import BoundsSelector from "../../BoundsSelector/BoundsSelector";
+import { useSiteContext } from "@/context/SiteContext";
 
-interface SiteListProps {
-  sites: Site[];
-  currentSite: Site | null;
-  loading: boolean;
-  onSelectSite: (site: Site) => void;
-  onCreateSite: (data: {
-    name: string;
-    description: string;
-    bounds: SiteBounds;
-  }) => Promise<Site>;
-  onUpdateSite: (id: string, data: { bounds: SiteBounds }) => Promise<Site>;
-  onDeleteSite: (id: string) => Promise<void>;
-}
-
-export default function SiteList({
-  sites,
-  currentSite,
-  loading,
-  onSelectSite,
-  onCreateSite,
-  onUpdateSite,
-  onDeleteSite,
-}: SiteListProps) {
+export default function SiteList() {
   const [showNewSiteDialog, setShowNewSiteDialog] = useState(false);
   const [showBoundsSelector, setShowBoundsSelector] = useState(false);
   const [editingSite, setEditingSite] = useState<Site | null>(null);
   const [pendingSiteName, setPendingSiteName] = useState("");
+
+  const {
+    sites,
+    selectedSite,
+    setSelectedSite,
+    loading,
+    createSite,
+    updateSite,
+    deleteSite,
+  } = useSiteContext();
 
   const handleStartCreateSite = (siteName: string) => {
     setPendingSiteName(siteName);
@@ -43,7 +32,7 @@ export default function SiteList({
   const handleCaptureBounds = async (bounds: SiteBounds) => {
     if (editingSite) {
       try {
-        await onUpdateSite(editingSite.id, { bounds });
+        await updateSite(editingSite.id, { bounds });
         setShowBoundsSelector(false);
         setEditingSite(null);
       } catch (error) {
@@ -52,12 +41,12 @@ export default function SiteList({
       }
     } else {
       try {
-        const site = await onCreateSite({
+        const site = await createSite({
           name: pendingSiteName,
           description: "",
           bounds,
         });
-        onSelectSite(site);
+        setSelectedSite(site);
         setPendingSiteName("");
         setShowBoundsSelector(false);
       } catch (error) {
@@ -83,7 +72,7 @@ export default function SiteList({
   const handleDeleteSite = async (id: string, name: string) => {
     if (confirm(`Delete site "${name}" and all its layers and features?`)) {
       try {
-        await onDeleteSite(id);
+        await deleteSite(id);
       } catch (error) {
         console.error("Failed to delete site:", error);
         alert("Failed to delete site");
@@ -117,8 +106,8 @@ export default function SiteList({
               <SiteItem
                 key={site.id}
                 site={site}
-                isActive={currentSite?.id === site.id}
-                onSelect={onSelectSite}
+                isActive={selectedSite?.id === site.id}
+                onSelect={setSelectedSite}
                 onEditBounds={handleEditSiteBounds}
                 onDelete={handleDeleteSite}
               />
