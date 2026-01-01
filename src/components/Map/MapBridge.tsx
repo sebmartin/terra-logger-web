@@ -10,10 +10,17 @@ import { useMap as useLeafletMap } from "react-leaflet";
 import { useMap } from "../../context/MapContext";
 import MapInteractions from "./MapInteractions";
 import FeatureRenderer from "./FeatureRenderer";
+import { useSiteContext } from "@/context/SiteContext";
+import { Layer } from "leaflet";
 
-export default function MapBridge() {
+interface MapBridgeProps {
+  baseMaps?: { [key: string]: Layer };
+}
+
+export default function MapBridge({ baseMaps }: MapBridgeProps) {
   const leafletMap = useLeafletMap();
-  const { setMap, updateMapState } = useMap();
+  const { map, setMap, updateMapState } = useMap();
+  const { selectedSite } = useSiteContext();
 
   useEffect(() => {
     if (leafletMap) {
@@ -41,9 +48,30 @@ export default function MapBridge() {
     }
   }, [leafletMap, setMap, updateMapState]);
 
+  // Navigate to site bounds when site is selected
+  useEffect(() => {
+    if (!map) return;
+
+    const boundsToShow = selectedSite?.bounds;
+
+    if (boundsToShow) {
+      map.fitBounds(
+        [
+          [boundsToShow.south, boundsToShow.west],
+          [boundsToShow.north, boundsToShow.east],
+        ],
+        {
+          padding: [50, 50],
+          animate: true,
+          duration: 0.5,
+        },
+      );
+    }
+  }, [map, selectedSite]);
+
   return (
     <>
-      <MapInteractions />
+      <MapInteractions baseMaps={baseMaps} />
       <FeatureRenderer />
     </>
   );

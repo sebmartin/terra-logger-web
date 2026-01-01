@@ -78,7 +78,7 @@ function setupCSP() {
             "default-src 'self'",
             scriptSrc,
             "style-src 'self' 'unsafe-inline'", // Leaflet requires inline styles
-            "img-src 'self' data: https://*.mapbox.com https://api.mapbox.com https://cdnjs.cloudflare.com",
+            "img-src 'self' data: https://*.mapbox.com https://api.mapbox.com https://cdnjs.cloudflare.com https://tile.openstreetmap.org https://tiles.stadiamaps.com https://server.arcgisonline.com",
             connectSrc,
             "font-src 'self' data:",
             "worker-src 'self' blob:",

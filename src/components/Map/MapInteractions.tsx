@@ -4,23 +4,29 @@
  * Separated from feature rendering for better separation of concerns
  */
 
-import { useEffect } from "react";
-import { useMap as useLeafletMap } from "react-leaflet";
+import { useEffect, useRef } from "react";
+import { useMap } from "react-leaflet";
 import "@geoman-io/leaflet-geoman-free";
 import { useFeatureContext } from "../../context/FeatureContext";
 import { useLayerContext } from "../../context/LayerContext";
 import type { FeatureType } from "../../types/feature";
+import L from "leaflet";
 
-export default function MapInteractions() {
-  const leafletMap = useLeafletMap();
+interface MapInteractionsProps {
+  baseMaps?: { [key: string]: L.Layer };
+}
+
+export default function MapInteractions({ baseMaps }: MapInteractionsProps) {
+  const map = useMap();
   const { createFeature, updateFeature, deleteFeature } = useFeatureContext();
   const { selectedLayerId } = useLayerContext();
+  const layersControlRef = useRef<L.Control.Layers | null>(null);
 
   useEffect(() => {
-    if (!leafletMap) return;
+    if (!map) return;
 
     // Add Leaflet.PM controls
-    leafletMap.pm.addControls({
+    map.pm.addControls({
       position: "topleft",
       drawText: !!selectedLayerId,
       drawMarker: !!selectedLayerId,
@@ -31,10 +37,26 @@ export default function MapInteractions() {
       dragMode: !!selectedLayerId,
       removalMode: !!selectedLayerId,
       rotateMode: !!selectedLayerId,
+
+      // Consider supporting these in future
+      drawCircle: false,
+      drawCircleMarker: false,
+      cutPolygon: false,
     });
 
+    // Initialize the map with layers control
+    if (map && baseMaps) {
+      // Remove previous control if it exists
+      if (layersControlRef.current) {
+        map.removeControl(layersControlRef.current);
+      }
+
+      // Add new control and store reference
+      layersControlRef.current = L.control.layers(baseMaps).addTo(map);
+    }
+
     // Configure global options
-    leafletMap.pm.setGlobalOptions({
+    map.pm.setGlobalOptions({
       snappable: true,
       snapDistance: 20,
       allowSelfIntersection: false,
@@ -102,13 +124,13 @@ export default function MapInteractions() {
         });
 
         // Remove the temporary drawing layer - it will be re-rendered by FeatureRenderer
-        leafletMap.removeLayer(layer);
+        map.removeLayer(layer);
 
         console.log("Feature created:", featureType);
       } catch (error) {
         console.error("Failed to create feature:", error);
         // Remove layer on error
-        leafletMap.removeLayer(layer);
+        map.removeLayer(layer);
       }
     };
 
@@ -170,7 +192,7 @@ export default function MapInteractions() {
         console.warn("Cannot delete locked feature:", featureId);
         alert("This feature is locked. Unlock it first to delete.");
         // Re-add the layer since PM removes it
-        leafletMap.addLayer(layer);
+        map.addLayer(layer);
         return;
       }
 
@@ -182,43 +204,43 @@ export default function MapInteractions() {
       } catch (error) {
         console.error("Failed to delete feature:", error);
         // Re-add layer on error
-        leafletMap.addLayer(layer);
+        map.addLayer(layer);
       }
     };
 
     // Register event listeners
-    leafletMap.on("pm:create", handleCreate);
-    leafletMap.on("pm:edit", handleEdit);
-    leafletMap.on("pm:remove", handleRemove);
+    map.on("pm:create", handleCreate);
+    map.on("pm:edit", handleEdit);
+    map.on("pm:remove", handleRemove);
 
     // Cleanup
     return () => {
-      leafletMap.pm.removeControls();
-      leafletMap.off("pm:create", handleCreate);
-      leafletMap.off("pm:edit", handleEdit);
-      leafletMap.off("pm:remove", handleRemove);
+      map.pm.removeControls();
+      map.off("pm:create", handleCreate);
+      map.off("pm:edit", handleEdit);
+      map.off("pm:remove", handleRemove);
     };
-  }, [leafletMap, createFeature, updateFeature, deleteFeature, selectedLayerId]);
+  }, [map, baseMaps, createFeature, updateFeature, deleteFeature, selectedLayerId]);
 
   // Handle Escape key to cancel drawing/editing
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && leafletMap) {
+      if (e.key === "Escape" && map) {
         // Disable all active PM drawing/editing modes
-        if (leafletMap.pm.globalDrawModeEnabled()) {
-          leafletMap.pm.disableDraw();
+        if (map.pm.globalDrawModeEnabled()) {
+          map.pm.disableDraw();
         }
 
-        if (leafletMap.pm.globalEditModeEnabled()) {
-          leafletMap.pm.disableGlobalEditMode();
+        if (map.pm.globalEditModeEnabled()) {
+          map.pm.disableGlobalEditMode();
         }
 
-        if (leafletMap.pm.globalDragModeEnabled()) {
-          leafletMap.pm.disableGlobalDragMode();
+        if (map.pm.globalDragModeEnabled()) {
+          map.pm.disableGlobalDragMode();
         }
 
-        if (leafletMap.pm.globalRemovalModeEnabled()) {
-          leafletMap.pm.disableGlobalRemovalMode();
+        if (map.pm.globalRemovalModeEnabled()) {
+          map.pm.disableGlobalRemovalMode();
         }
       }
     };
@@ -228,7 +250,7 @@ export default function MapInteractions() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [leafletMap]);
+  }, [map]);
 
   return null;
 }

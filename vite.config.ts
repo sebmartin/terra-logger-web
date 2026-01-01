@@ -65,7 +65,7 @@ export default defineConfig(({ command }) => {
     },
     build: {
       outDir: 'dist-renderer',
-      sourcemap
+      sourcemap: isServe ? 'inline' : sourcemap
     },
     server: {
       port: 5173,
