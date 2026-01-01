@@ -1,6 +1,6 @@
 import { AppProviders } from "./providers/AppProviders";
 import Sidebar from "./components/Sidebar/Sidebar";
-import MapContainer from "./components/Map/MapContainer";
+import MapLibreContainer from "./components/Map/MapLibreContainer";
 import "./App.css";
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
       <div className="app">
         <Sidebar />
         <div className="map-wrapper">
-          <MapContainer />
+          <MapLibreContainer />
         </div>
       </div>
     </AppProviders>

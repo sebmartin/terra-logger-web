@@ -1,4 +1,6 @@
 import type { Map as LeafletMap, LatLngBounds, LatLng } from "leaflet";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { TerraDraw } from "terra-draw";
 
 export type DrawMode =
   | "select"
@@ -9,15 +11,33 @@ export type DrawMode =
   | "measure"
   | null;
 
+export interface Bounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
+export interface MapCenter {
+  lat: number;
+  lng: number;
+}
+
 export interface MapState {
-  center: LatLng | null;
+  center: LatLng | MapCenter | null;
   zoom: number;
-  bounds: LatLngBounds | null;
+  bounds: LatLngBounds | Bounds | null;
 }
 
 export interface MapContextType {
-  map: LeafletMap | null;
-  setMap: (map: LeafletMap | null) => void;
+  // Support both Leaflet and MapLibre during migration
+  map: LeafletMap | MapLibreMap | any | null;
+  setMap: (map: LeafletMap | MapLibreMap | any | null) => void;
+
+  // Terra Draw instance
+  draw?: TerraDraw | null;
+  setDraw?: (draw: TerraDraw | null) => void;
+
   mapState: MapState;
   updateMapState: (state: Partial<MapState>) => void;
   drawMode: DrawMode;

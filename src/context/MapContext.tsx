@@ -7,12 +7,15 @@ import {
   ReactNode,
 } from "react";
 import type { Map as LeafletMap } from "leaflet";
+import type { Map as MapLibreMap } from "maplibre-gl";
+import type { TerraDraw } from "terra-draw";
 import type { MapContextType, DrawMode, MapState } from "../types/map";
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
 
 export function MapProvider({ children }: { children: ReactNode }) {
-  const [map, setMap] = useState<LeafletMap | null>(null);
+  const [map, setMap] = useState<LeafletMap | MapLibreMap | any | null>(null);
+  const [draw, setDraw] = useState<TerraDraw | null>(null);
   const [drawMode, setDrawMode] = useState<DrawMode>(null);
   const [mapState, setMapState] = useState<MapState>({
     center: null,
@@ -28,12 +31,14 @@ export function MapProvider({ children }: { children: ReactNode }) {
     () => ({
       map,
       setMap,
+      draw,
+      setDraw,
       mapState,
       updateMapState,
       drawMode,
       setDrawMode,
     }),
-    [map, mapState, updateMapState, drawMode],
+    [map, draw, mapState, updateMapState, drawMode],
   );
 
   return <MapContext.Provider value={value}>{children}</MapContext.Provider>;

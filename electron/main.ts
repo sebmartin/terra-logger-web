@@ -66,9 +66,11 @@ function setupCSP() {
       : "script-src 'self'";
 
     // In development, allow connections to Vite dev server
+    // Also allow mapbox:// protocol for MapLibre terrain data
+    // Allow MapLibre and Maptiler tile servers
     const connectSrc = isDev
-      ? "connect-src 'self' http://localhost:* ws://localhost:* https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com"
-      : "connect-src 'self' https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com";
+      ? "connect-src 'self' http://localhost:* ws://localhost:* https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://demotiles.maplibre.org https://api.maptiler.com https://*.maptiler.com mapbox:"
+      : "connect-src 'self' https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://demotiles.maplibre.org https://api.maptiler.com https://*.maptiler.com mapbox:";
 
     callback({
       responseHeaders: {
