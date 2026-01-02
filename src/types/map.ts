@@ -1,5 +1,4 @@
-import type { Map as LeafletMap, LatLngBounds, LatLng } from "leaflet";
-import type { Map as MapLibreMap } from "maplibre-gl";
+import type { Map as MapboxMap } from "mapbox-gl";
 import type { TerraDraw } from "terra-draw";
 
 export type DrawMode =
@@ -24,15 +23,14 @@ export interface MapCenter {
 }
 
 export interface MapState {
-  center: LatLng | MapCenter | null;
+  center: MapCenter | null;
   zoom: number;
-  bounds: LatLngBounds | Bounds | null;
+  bounds: Bounds | null;
 }
 
 export interface MapContextType {
-  // Support both Leaflet and MapLibre during migration
-  map: LeafletMap | MapLibreMap | any | null;
-  setMap: (map: LeafletMap | MapLibreMap | any | null) => void;
+  map: MapboxMap | null;
+  setMap: (map: MapboxMap | null) => void;
 
   // Terra Draw instance
   draw?: TerraDraw | null;

@@ -25,6 +25,9 @@ out/
 *.db-shm
 *.db-wal
 
+# Claude settings
+.claude/settings.local.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -6,15 +6,14 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import type { Map as LeafletMap } from "leaflet";
-import type { Map as MapLibreMap } from "maplibre-gl";
+import type { Map as MapboxMap } from "mapbox-gl";
 import type { TerraDraw } from "terra-draw";
 import type { MapContextType, DrawMode, MapState } from "../types/map";
 
 const MapContext = createContext<MapContextType | undefined>(undefined);
 
 export function MapProvider({ children }: { children: ReactNode }) {
-  const [map, setMap] = useState<LeafletMap | MapLibreMap | any | null>(null);
+  const [map, setMap] = useState<MapboxMap | null>(null);
   const [draw, setDraw] = useState<TerraDraw | null>(null);
   const [drawMode, setDrawMode] = useState<DrawMode>(null);
   const [mapState, setMapState] = useState<MapState>({

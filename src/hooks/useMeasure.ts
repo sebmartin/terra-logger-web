@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as turf from "@turf/turf";
-import type { LatLng } from "leaflet";
+
+type LatLng = { lat: number; lng: number };
 
 export interface MeasurementResult {
   distance?: {

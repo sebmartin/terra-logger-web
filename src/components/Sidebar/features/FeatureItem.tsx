@@ -1,4 +1,4 @@
-import LeafletIcon from "@/components/common/LeafletIcon";
+import FeatureIcon from "@/components/common/FeatureIcon";
 import type { Feature } from "../../../types/feature";
 import { ToggleButton } from "../../common";
 
@@ -24,7 +24,7 @@ export default function FeatureItem({
     <div className="feature-item">
       <div className="feature-info">
         <div className="feature-type">
-          <LeafletIcon name={feature.type} />
+          <FeatureIcon name={feature.type} />
           <p className="feature-type-text">{feature.type}</p>
         </div>
         <div className="feature-name">{feature.name || "Unnamed"}</div>
