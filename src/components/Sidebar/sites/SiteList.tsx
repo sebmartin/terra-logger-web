@@ -5,7 +5,7 @@ import CollapsibleSection from "../CollapsibleSection";
 import SiteItem from "./SiteItem";
 import NewSiteDialog from "./NewSiteDialog";
 import BoundsSelector from "../../BoundsSelector/BoundsSelector";
-import { useSiteContext } from "@/context/SiteContext";
+import { useSiteStore } from "../../../stores/siteStore";
 
 export default function SiteList() {
   const [showNewSiteDialog, setShowNewSiteDialog] = useState(false);
@@ -13,15 +13,13 @@ export default function SiteList() {
   const [editingSite, setEditingSite] = useState<Site | null>(null);
   const [pendingSiteName, setPendingSiteName] = useState("");
 
-  const {
-    sites,
-    selectedSite,
-    setSelectedSite,
-    loading,
-    createSite,
-    updateSite,
-    deleteSite,
-  } = useSiteContext();
+  const sites = useSiteStore((state) => state.sites);
+  const selectedSite = useSiteStore((state) => state.selectedSite());
+  const setSelectedSiteId = useSiteStore((state) => state.setSelectedSiteId);
+  const loading = useSiteStore((state) => state.loading);
+  const createSite = useSiteStore((state) => state.createSite);
+  const updateSite = useSiteStore((state) => state.updateSite);
+  const deleteSite = useSiteStore((state) => state.deleteSite);
 
   const handleStartCreateSite = (siteName: string) => {
     setPendingSiteName(siteName);
@@ -46,7 +44,7 @@ export default function SiteList() {
           description: "",
           bounds,
         });
-        setSelectedSite(site);
+        setSelectedSiteId(site.id);
         setPendingSiteName("");
         setShowBoundsSelector(false);
       } catch (error) {
@@ -107,7 +105,7 @@ export default function SiteList() {
                 key={site.id}
                 site={site}
                 isActive={selectedSite?.id === site.id}
-                onSelect={setSelectedSite}
+                onSelect={(site) => setSelectedSiteId(site.id)}
                 onEditBounds={handleEditSiteBounds}
                 onDelete={handleDeleteSite}
               />

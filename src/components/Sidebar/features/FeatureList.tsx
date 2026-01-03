@@ -1,9 +1,10 @@
-import { useFeatureContext } from "@/context/FeatureContext";
+import { useFeatureStore } from "../../../stores/featureStore";
 import CollapsibleSection from "../CollapsibleSection";
 import FeatureItem from "./FeatureItem";
 
 export default function FeatureList() {
-  const { features, updateFeature } = useFeatureContext();
+  const features = useFeatureStore((state) => state.features);
+  const updateFeature = useFeatureStore((state) => state.updateFeature);
 
   const handleToggleLock = async (featureId: string, currentLocked: boolean) => {
     try {

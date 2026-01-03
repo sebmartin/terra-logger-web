@@ -62,12 +62,10 @@ function setupCSP() {
 
     // In development, Vite needs 'unsafe-inline' and 'unsafe-eval' for HMR
     const scriptSrc = isDev
-      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' chrome-extension:"
       : "script-src 'self'";
 
-    // In development, allow connections to Vite dev server
-    // Also allow mapbox:// protocol for MapLibre terrain data
-    // Allow MapLibre and Maptiler tile servers
+    // Allow insecure hosts in development
     const connectSrc = isDev
       ? "connect-src 'self' http://localhost:* ws://localhost:* https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://demotiles.maplibre.org https://api.maptiler.com https://*.maptiler.com mapbox:"
       : "connect-src 'self' https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://demotiles.maplibre.org https://api.maptiler.com https://*.maptiler.com mapbox:";
@@ -127,7 +125,7 @@ function initializeServices() {
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   setupCSP();
   initializeServices();
   createWindow();

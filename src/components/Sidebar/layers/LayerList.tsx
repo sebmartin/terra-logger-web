@@ -3,21 +3,20 @@ import { IconButton } from "../../common";
 import CollapsibleSection from "../CollapsibleSection";
 import LayerItem from "./LayerItem";
 import NewLayerDialog from "./NewLayerDialog";
-import { useLayerContext } from "@/context/LayerContext";
-import { useSiteContext } from "@/context/SiteContext";
+import { useLayerStore } from "../../../stores/layerStore";
+import { useSiteStore } from "../../../stores/siteStore";
 
 export default function LayerList() {
   const [showNewLayerDialog, setShowNewLayerDialog] = useState(false);
-  const {
-    layers,
-    toggleLayerVisibility,
-    selectedLayerId,
-    setSelectedLayerId,
-    loadLayers,
-    createLayer,
-    deleteLayer,
-  } = useLayerContext();
-  const { selectedSite } = useSiteContext();
+
+  const layers = useLayerStore((state) => state.layers);
+  const toggleLayerVisibility = useLayerStore((state) => state.toggleLayerVisibility);
+  const selectedLayerId = useLayerStore((state) => state.selectedLayerId);
+  const setSelectedLayerId = useLayerStore((state) => state.setSelectedLayerId);
+  const createLayer = useLayerStore((state) => state.createLayer);
+  const deleteLayer = useLayerStore((state) => state.deleteLayer);
+
+  const selectedSite = useSiteStore((state) => state.selectedSite());
 
   if (!selectedSite) {
     return null;
@@ -33,7 +32,7 @@ export default function LayerList() {
       });
       setSelectedLayerId(layer.id);
       setShowNewLayerDialog(false);
-      await loadLayers(selectedSite.id);
+      // No need to reload - store subscription handles it
     } catch (error) {
       console.error("Failed to create layer:", error);
       alert("Failed to create layer");
@@ -44,10 +43,7 @@ export default function LayerList() {
     if (confirm(`Delete layer "${name}" and all its features?`)) {
       try {
         await deleteLayer(id);
-        if (selectedLayerId === id) {
-          setSelectedLayerId(null);
-        }
-        await loadLayers(selectedSite.id);
+        // No need to reload or clear selection - store handles it
       } catch (error) {
         console.error("Failed to delete layer:", error);
         alert("Failed to delete layer");

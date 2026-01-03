@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useMap } from "../../context/MapContext";
+import { useMapStore } from "../../stores/mapStore";
 import type { SiteBounds } from "../../types/site";
 import "./BoundsSelector.css";
 
@@ -17,7 +17,7 @@ export default function BoundsSelector({
   onCancel,
   title = "Position Map to Capture Site Area",
 }: BoundsSelectorProps) {
-  const { map } = useMap();
+  const map = useMapStore((state) => state.map);
   const [currentBounds, setCurrentBounds] = useState<SiteBounds | null>(null);
 
   // Set initial bounds if provided
@@ -36,6 +36,7 @@ export default function BoundsSelector({
 
     const updateBounds = () => {
       const bounds = map.getBounds();
+      if (!bounds) return;
       setCurrentBounds({
         north: bounds.getNorth(),
         south: bounds.getSouth(),
