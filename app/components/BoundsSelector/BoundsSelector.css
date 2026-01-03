@@ -1,0 +1,188 @@
+.bounds-selector-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.bounds-selector-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.bounds-selector-border {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.bounds-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+}
+
+.bounds-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+}
+
+.bounds-left {
+  top: 60px;
+  left: 0;
+  bottom: 60px;
+  width: 60px;
+}
+
+.bounds-right {
+  top: 60px;
+  right: 0;
+  bottom: 60px;
+  width: 60px;
+}
+
+.bounds-selector-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #007bff;
+  pointer-events: none;
+}
+
+.corner-tl {
+  top: 60px;
+  left: 60px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.corner-tr {
+  top: 60px;
+  right: 60px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.corner-bl {
+  bottom: 60px;
+  left: 60px;
+  border-right: none;
+  border-top: none;
+}
+
+.corner-br {
+  bottom: 60px;
+  right: 60px;
+  border-left: none;
+  border-top: none;
+}
+
+.bounds-selector-controls {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 400px;
+  max-width: 500px;
+  pointer-events: auto;
+  z-index: 1001;
+}
+
+.bounds-selector-header {
+  margin-bottom: 16px;
+}
+
+.bounds-selector-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.bounds-selector-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.bounds-selector-info {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.bounds-coord {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bounds-coord .label {
+  color: #666;
+  font-weight: 600;
+}
+
+.bounds-coord .value {
+  color: #333;
+}
+
+.bounds-selector-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #f8f9fa;
+}
+
+.btn-primary {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: #0056b3;
+}
+
+.btn-primary:disabled {
+  background: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
