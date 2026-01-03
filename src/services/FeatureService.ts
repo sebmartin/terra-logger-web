@@ -12,7 +12,9 @@ export class FeatureService {
    * List all features for a specific layer
    */
   async list(layerId: string): Promise<Feature[]> {
-    const rawFeatures = await window.electron.listFeatures(layerId);
+    const response = await fetch(`/api/layers/${layerId}/features`);
+    if (!response.ok) throw new Error("Failed to fetch features");
+    const rawFeatures = await response.json();
     return parseFeatures(rawFeatures);
   }
 
@@ -21,8 +23,10 @@ export class FeatureService {
    */
   async get(featureId: string): Promise<Feature | null> {
     try {
-      const raw = await window.electron.getFeature(featureId);
-      if (!raw) return null;
+      const response = await fetch(`/api/features/${featureId}`);
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error("Failed to fetch feature");
+      const raw = await response.json();
       return parseFeature(raw);
     } catch (error) {
       console.error("Failed to get feature:", error);
@@ -34,10 +38,16 @@ export class FeatureService {
    * Create a new feature
    */
   async create(layerId: string, featureData: Omit<NewFeature, "layer_id">): Promise<Feature> {
-    const created = await window.electron.createFeature(layerId, {
-      ...featureData,
-      layer_id: layerId,
+    const response = await fetch(`/api/layers/${layerId}/features`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...featureData,
+        layer_id: layerId,
+      }),
     });
+    if (!response.ok) throw new Error("Failed to create feature");
+    const created = await response.json();
     return parseFeature(created);
   }
 
@@ -45,7 +55,13 @@ export class FeatureService {
    * Update an existing feature
    */
   async update(featureId: string, updates: FeatureUpdate): Promise<Feature> {
-    const updated = await window.electron.updateFeature(featureId, updates);
+    const response = await fetch(`/api/features/${featureId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) throw new Error("Failed to update feature");
+    const updated = await response.json();
     return parseFeature(updated);
   }
 
@@ -53,7 +69,10 @@ export class FeatureService {
    * Delete a feature
    */
   async delete(featureId: string): Promise<void> {
-    await window.electron.deleteFeature(featureId);
+    const response = await fetch(`/api/features/${featureId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Failed to delete feature");
   }
 
   /**

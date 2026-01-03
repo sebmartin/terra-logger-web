@@ -11,7 +11,9 @@ export class LayerService {
    * List all layers
    */
   async list(): Promise<Layer[]> {
-    const rawLayers = await window.electron.listLayers();
+    const response = await fetch("/api/layers");
+    if (!response.ok) throw new Error("Failed to fetch layers");
+    const rawLayers = await response.json();
     return parseLayers(rawLayers);
   }
 
@@ -19,7 +21,9 @@ export class LayerService {
    * List layers for a specific site
    */
   async listForSite(siteId: string): Promise<Layer[]> {
-    const rawLayers = await window.electron.listSiteLayers(siteId);
+    const response = await fetch(`/api/sites/${siteId}/layers`);
+    if (!response.ok) throw new Error("Failed to fetch site layers");
+    const rawLayers = await response.json();
     return parseLayers(rawLayers);
   }
 
@@ -28,8 +32,10 @@ export class LayerService {
    */
   async get(layerId: string): Promise<Layer | null> {
     try {
-      const raw = await window.electron.getLayer(layerId);
-      if (!raw) return null;
+      const response = await fetch(`/api/layers/${layerId}`);
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error("Failed to fetch layer");
+      const raw = await response.json();
       return parseLayer(raw);
     } catch (error) {
       console.error("Failed to get layer:", error);
@@ -41,7 +47,13 @@ export class LayerService {
    * Create a new layer
    */
   async create(layerData: NewLayer): Promise<Layer> {
-    const created = await window.electron.createLayer(layerData);
+    const response = await fetch("/api/layers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(layerData),
+    });
+    if (!response.ok) throw new Error("Failed to create layer");
+    const created = await response.json();
     return parseLayer(created);
   }
 
@@ -49,7 +61,13 @@ export class LayerService {
    * Update an existing layer
    */
   async update(layerId: string, updates: LayerUpdate): Promise<Layer> {
-    const updated = await window.electron.updateLayer(layerId, updates);
+    const response = await fetch(`/api/layers/${layerId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) throw new Error("Failed to update layer");
+    const updated = await response.json();
     return parseLayer(updated);
   }
 
@@ -57,7 +75,10 @@ export class LayerService {
    * Delete a layer
    */
   async delete(layerId: string): Promise<void> {
-    await window.electron.deleteLayer(layerId);
+    const response = await fetch(`/api/layers/${layerId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Failed to delete layer");
   }
 
   /**

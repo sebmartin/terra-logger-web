@@ -11,7 +11,9 @@ export class SiteService {
    * List all sites
    */
   async list(): Promise<Site[]> {
-    const rawSites = await window.electron.listSites();
+    const response = await fetch("/api/sites");
+    if (!response.ok) throw new Error("Failed to fetch sites");
+    const rawSites = await response.json();
     return parseSites(rawSites);
   }
 
@@ -20,8 +22,10 @@ export class SiteService {
    */
   async get(siteId: string): Promise<Site | null> {
     try {
-      const raw = await window.electron.getSite(siteId);
-      if (!raw) return null;
+      const response = await fetch(`/api/sites/${siteId}`);
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error("Failed to fetch site");
+      const raw = await response.json();
       return parseSite(raw);
     } catch (error) {
       console.error("Failed to get site:", error);
@@ -33,7 +37,13 @@ export class SiteService {
    * Create a new site
    */
   async create(siteData: NewSite): Promise<Site> {
-    const created = await window.electron.createSite(siteData);
+    const response = await fetch("/api/sites", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(siteData),
+    });
+    if (!response.ok) throw new Error("Failed to create site");
+    const created = await response.json();
     return parseSite(created);
   }
 
@@ -41,7 +51,13 @@ export class SiteService {
    * Update an existing site
    */
   async update(siteId: string, updates: SiteUpdate): Promise<Site> {
-    const updated = await window.electron.updateSite(siteId, updates);
+    const response = await fetch(`/api/sites/${siteId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) throw new Error("Failed to update site");
+    const updated = await response.json();
     return parseSite(updated);
   }
 
@@ -49,7 +65,10 @@ export class SiteService {
    * Delete a site
    */
   async delete(siteId: string): Promise<void> {
-    await window.electron.deleteSite(siteId);
+    const response = await fetch(`/api/sites/${siteId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Failed to delete site");
   }
 }
 
