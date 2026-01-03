@@ -1,6 +1,75 @@
-# Terra Logger
+# Terra Logger - Next.js
 
-An Electron desktop application for designing offgrid cabin layouts using geospatial tools. Built with React, Leaflet, and Mapbox for satellite imagery visualization.
+A Next.js web application for designing offgrid cabin layouts using geospatial tools.
+
+## Getting Started
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Create a `.env.local` file with your Mapbox token:
+```bash
+cp .env.local.example .env.local
+# Edit .env.local and add your Mapbox token
+```
+
+3. Run the development server:
+```bash
+npm run dev
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+app/
+├── api/              # Next.js API routes
+│   ├── sites/       # Site CRUD endpoints
+│   ├── layers/      # Layer CRUD endpoints
+│   └── features/    # Feature CRUD endpoints
+├── components/       # React components
+├── stores/          # Zustand state management
+├── services/        # API service layer
+├── types/           # TypeScript type definitions
+└── utils/           # Utility functions
+
+lib/
+└── db/              # SQLite database service
+
+data/
+└── terra-logger.db  # SQLite database (created automatically)
+```
+
+## Features
+
+- **Sites**: Define geographic boundaries for your projects
+- **Layers**: Organize features into layers within sites
+- **Features**: Draw and edit markers, lines, polygons, rectangles, and circles
+- **Measurements**: Automatic distance and area calculations
+- **Map Tools**: Powered by Mapbox GL JS and Terra Draw
+
+## Tech Stack
+
+- **Framework**: Next.js 15
+- **Database**: SQLite with better-sqlite3
+- **State Management**: Zustand
+- **Maps**: Mapbox GL JS
+- **Drawing**: Terra Draw
+- **Styling**: CSS Modules
+
+## Building for Production
+
+```bash
+npm run build
+npm start
+```
+
+## License
+
+MIT
 
 ## Features
 
