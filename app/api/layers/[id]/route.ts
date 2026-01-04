@@ -10,14 +10,14 @@ export async function GET(
     const { id } = await params;
     const db = getDb();
     const layer = db.getLayer(id);
-    
+
     if (!layer) {
       return NextResponse.json(
         { error: "Layer not found" },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json(layer);
   } catch (error) {
     console.error("Error getting layer:", error);

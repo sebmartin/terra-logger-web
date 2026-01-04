@@ -1,4 +1,4 @@
-import FeatureIcon from "@/components/common/FeatureIcon";
+import FeatureIcon from "../../common/FeatureIcon";
 import type { Feature } from "../../../types/feature";
 import { ToggleButton } from "../../common";
 

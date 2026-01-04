@@ -10,14 +10,14 @@ export async function GET(
     const { id } = await params;
     const db = getDb();
     const feature = db.getFeature(id);
-    
+
     if (!feature) {
       return NextResponse.json(
         { error: "Feature not found" },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json(feature);
   } catch (error) {
     console.error("Error getting feature:", error);

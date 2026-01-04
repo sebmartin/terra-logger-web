@@ -10,14 +10,14 @@ export async function GET(
     const { id } = await params;
     const db = getDb();
     const site = db.getSite(id);
-    
+
     if (!site) {
       return NextResponse.json(
         { error: "Site not found" },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json(site);
   } catch (error) {
     console.error("Error getting site:", error);
