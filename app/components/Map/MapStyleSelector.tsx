@@ -29,30 +29,13 @@ export function MapStyleSelector({
   };
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 10,
-        left: 10,
-        background: "white",
-        padding: "8px 12px",
-        borderRadius: "4px",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-        zIndex: 1,
-      }}
-    >
+    <div className="absolute top-2.5 left-2.5 bg-white px-3 py-2 rounded shadow z-10">
       <select
         value={getCurrentStyleKey()}
         onChange={(e) =>
           onStyleChange(MAP_STYLES[e.target.value as keyof typeof MAP_STYLES])
         }
-        style={{
-          border: "none",
-          outline: "none",
-          cursor: "pointer",
-          fontSize: "14px",
-          fontFamily: "inherit",
-        }}
+        className="border-none outline-none cursor-pointer text-sm font-sans"
       >
         <option value="topology">Topology (Custom)</option>
         <option value="satellite">Satellite</option>

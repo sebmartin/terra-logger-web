@@ -1,5 +1,14 @@
-import { ReactNode } from "react";
-import { createPortal } from "react-dom";
+"use client";
+
+import { ReactNode, useCallback } from "react";
+import {
+  Dialog,
+  DialogOverlay,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "../ui/dialog";
 
 interface ModalProps {
   title: string;
@@ -8,13 +17,23 @@ interface ModalProps {
 }
 
 export default function Modal({ title, children, onClose }: ModalProps) {
-  return createPortal(
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={(e) => e.stopPropagation()}>
-        <h3>{title}</h3>
-        {children}
-      </div>
-    </div>,
-    document.body
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) onClose();
+    },
+    [onClose]
+  );
+
+  return (
+    <Dialog open onOpenChange={handleOpenChange}>
+      <DialogOverlay />
+      <DialogContent className="bg-white">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-2">{children}</div>
+        <DialogClose className="absolute right-4 top-4" aria-label="Close" />
+      </DialogContent>
+    </Dialog>
   );
 }

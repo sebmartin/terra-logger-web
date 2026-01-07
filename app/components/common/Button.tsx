@@ -1,7 +1,8 @@
 import { ReactNode, MouseEvent } from "react";
+import { Button as ShadcnButton } from "../ui/button";
 
 interface ButtonProps {
-  onClick: (e: MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
   children: ReactNode;
   variant?: "default" | "primary";
   disabled?: boolean;
@@ -15,15 +16,17 @@ export default function Button({
   disabled = false,
   className = "",
 }: ButtonProps) {
-  const variantClass = variant === "primary" ? "btn-primary" : "";
+  // Map legacy variants to shadcn variants
+  const mappedVariant = variant === "primary" ? "default" : "outline";
 
   return (
-    <button
-      className={`${variantClass} ${className}`.trim()}
+    <ShadcnButton
       onClick={onClick}
       disabled={disabled}
+      variant={mappedVariant as any}
+      className={className}
     >
       {children}
-    </button>
+    </ShadcnButton>
   );
 }

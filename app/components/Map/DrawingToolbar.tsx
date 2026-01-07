@@ -17,80 +17,55 @@ export function DrawingToolbar({
 }: DrawingToolbarProps) {
   if (!visible) return null;
 
-  const getToolButtonStyle = (mode: string | null) => ({
-    padding: "10px",
-    border: currentMode === mode ? "2px solid #3388ff" : "1px solid #e0e0e0",
-    background: currentMode === mode ? "#e3f2fd" : "white",
-    cursor: "pointer",
-    borderRadius: "4px",
-    fontSize: "20px",
-    fontWeight: currentMode === mode ? "600" : "normal",
-    fontFamily: "inherit",
-    transition: "all 0.2s ease",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: "44px",
-    minHeight: "44px",
-  });
+  const getToolButtonClass = (mode: string | null) =>
+    [
+      "min-w-11 min-h-11 flex items-center justify-center rounded border text-2xl transition-all",
+      currentMode === mode
+        ? "border-blue-600 bg-blue-50 font-semibold"
+        : "border-gray-300 bg-white",
+    ].join(" ");
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 60,
-        left: 10,
-        background: "white",
-        padding: "6px",
-        borderRadius: "8px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "4px",
-        zIndex: 1,
-      }}
-    >
+    <div className="absolute top-[60px] left-[10px] bg-white p-1.5 rounded-lg shadow-md flex flex-col gap-1 z-10">
       <button
         onClick={() => onModeChange("select")}
-        style={getToolButtonStyle("select")}
+        className={getToolButtonClass("select")}
         title="Select & Edit - Click features to select, drag to move/edit"
       >
-        <span style={{ fontSize: "18px" }}>↖️</span>
+        <span className="text-xl">↖️</span>
       </button>
-      <div
-        style={{ height: "1px", background: "#e0e0e0", margin: "2px 0" }}
-      />
+      <div className="h-px bg-gray-200 my-0.5" />
       <button
         onClick={() => onModeChange("point")}
-        style={getToolButtonStyle("point")}
+        className={getToolButtonClass("point")}
         title="Marker - Click to place"
       >
         📍
       </button>
       <button
         onClick={() => onModeChange("linestring")}
-        style={getToolButtonStyle("linestring")}
+        className={getToolButtonClass("linestring")}
         title="Line - Click points, double-click to finish"
       >
         📏
       </button>
       <button
         onClick={() => onModeChange("polygon")}
-        style={getToolButtonStyle("polygon")}
+        className={getToolButtonClass("polygon")}
         title="Polygon - Click points, double-click to finish"
       >
         ⬟
       </button>
       <button
         onClick={() => onModeChange("rectangle")}
-        style={getToolButtonStyle("rectangle")}
+        className={getToolButtonClass("rectangle")}
         title="Rectangle - Click two corners"
       >
         ▭
       </button>
       <button
         onClick={() => onModeChange("circle")}
-        style={getToolButtonStyle("circle")}
+        className={getToolButtonClass("circle")}
         title="Circle - Click center, then radius"
       >
         ⭕
