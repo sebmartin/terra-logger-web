@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
-// GET /api/sites/[siteId]/layers - List all layers for a site
+// GET /api/sites/[id]/layers - List all layers for a site
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ siteId: string }> }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { siteId } = await params;
+    const { id } = await params;
     const db = getDb();
-    const layers = db.listLayersForSite(siteId);
+    const layers = db.listLayersForSite(id);
     return NextResponse.json(layers);
   } catch (error) {
     console.error("Error listing site layers:", error);

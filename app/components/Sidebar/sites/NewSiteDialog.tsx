@@ -32,7 +32,7 @@ export default function NewSiteDialog({
         autoFocus
       />
       <p className="modal-hint">
-        Next, you'll position the map to capture the site area.
+        Next, you&apos;ll position the map to capture the site area.
       </p>
       <div className="modal-actions">
         <Button onClick={onCancel}>Cancel</Button>

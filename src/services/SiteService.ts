@@ -3,8 +3,8 @@
  * Encapsulates all site-related business logic and API calls
  */
 
-import type { Site, NewSite, SiteUpdate } from "../types/site";
-import { parseSite, parseSites } from "../utils/geojson";
+import type { Site, NewSite, SiteUpdate } from "@/app/types/site";
+import { parseSite, parseSites } from "@/app/utils/geojson";
 
 export class SiteService {
   /**

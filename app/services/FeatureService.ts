@@ -7,12 +7,18 @@ import type { Feature, NewFeature, FeatureUpdate, FeatureType } from "../types/f
 import { parseFeature, parseFeatures } from "../utils/geojson";
 import { calculateMeasurements, type Measurements } from "../utils/measurements";
 
+function getBaseUrl() {
+  if (typeof window !== 'undefined') return '';
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return `http://localhost:${process.env.PORT || 3000}`;
+}
+
 export class FeatureService {
   /**
    * List all features for a specific layer
    */
   async list(layerId: string): Promise<Feature[]> {
-    const response = await fetch(`/api/layers/${layerId}/features`);
+    const response = await fetch(`${getBaseUrl()}/api/layers/${layerId}/features`);
     if (!response.ok) throw new Error("Failed to fetch features");
     const rawFeatures = await response.json();
     return parseFeatures(rawFeatures);
@@ -23,7 +29,7 @@ export class FeatureService {
    */
   async get(featureId: string): Promise<Feature | null> {
     try {
-      const response = await fetch(`/api/features/${featureId}`);
+      const response = await fetch(`${getBaseUrl()}/api/features/${featureId}`);
       if (response.status === 404) return null;
       if (!response.ok) throw new Error("Failed to fetch feature");
       const raw = await response.json();
@@ -38,7 +44,7 @@ export class FeatureService {
    * Create a new feature
    */
   async create(layerId: string, featureData: Omit<NewFeature, "layer_id">): Promise<Feature> {
-    const response = await fetch(`/api/layers/${layerId}/features`, {
+    const response = await fetch(`${getBaseUrl()}/api/layers/${layerId}/features`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -55,7 +61,7 @@ export class FeatureService {
    * Update an existing feature
    */
   async update(featureId: string, updates: FeatureUpdate): Promise<Feature> {
-    const response = await fetch(`/api/features/${featureId}`, {
+    const response = await fetch(`${getBaseUrl()}/api/features/${featureId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
@@ -69,7 +75,7 @@ export class FeatureService {
    * Delete a feature
    */
   async delete(featureId: string): Promise<void> {
-    const response = await fetch(`/api/features/${featureId}`, {
+    const response = await fetch(`${getBaseUrl()}/api/features/${featureId}`, {
       method: "DELETE",
     });
     if (!response.ok) throw new Error("Failed to delete feature");

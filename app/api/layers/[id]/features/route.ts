@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 
-// GET /api/layers/[layerId]/features - List all features for a layer
+// GET /api/layers/[id]/features - List all features for a layer
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ layerId: string }> }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { layerId } = await params;
+    const { id } = await params;
     const db = getDb();
-    const features = db.listFeatures(layerId);
+    const features = db.listFeatures(id);
     return NextResponse.json(features);
   } catch (error) {
     console.error("Error listing features:", error);
@@ -20,16 +20,16 @@ export async function GET(
   }
 }
 
-// POST /api/layers/[layerId]/features - Create a new feature
+// POST /api/layers/[id]/features - Create a new feature
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ layerId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { layerId } = await params;
+    const { id } = await params;
     const body = await request.json();
     const db = getDb();
-    const feature = db.createFeature(layerId, body);
+    const feature = db.createFeature(id, body);
     return NextResponse.json(feature, { status: 201 });
   } catch (error) {
     console.error("Error creating feature:", error);

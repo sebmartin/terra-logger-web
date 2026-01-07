@@ -111,5 +111,7 @@ export const useSiteStore = create<SiteStore>()(
   )
 );
 
-// Auto-load sites on store creation
-useSiteStore.getState().loadSites();
+// Auto-load sites on store creation (only in browser)
+if (typeof window !== 'undefined') {
+  useSiteStore.getState().loadSites();
+}

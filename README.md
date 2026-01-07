@@ -140,7 +140,7 @@ cp .env.example .env
 4. Edit `.env` and add your token:
 
 ```env
-VITE_MAPBOX_ACCESS_TOKEN=pk.your_actual_token_here
+NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=pk.your_actual_token_here
 ```
 
 ### 3. Run Development Mode

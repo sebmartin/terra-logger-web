@@ -3,8 +3,8 @@
  * Encapsulates all layer-related business logic and API calls
  */
 
-import type { Layer, NewLayer, LayerUpdate } from "../types/layer";
-import { parseLayer, parseLayers } from "../utils/geojson";
+import type { Layer, NewLayer, LayerUpdate } from "@/app/types/layer";
+import { parseLayer, parseLayers } from "@/app/utils/geojson";
 
 export class LayerService {
   /**

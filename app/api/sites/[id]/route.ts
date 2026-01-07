@@ -3,7 +3,7 @@ import { getDb } from "@/lib/db";
 
 // GET /api/sites/[id] - Get a specific site
 export async function GET(
-  request: NextRequest,
+   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -50,7 +50,7 @@ export async function PATCH(
 
 // DELETE /api/sites/[id] - Delete a specific site
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

@@ -1,4 +1,4 @@
-import { FeatureType } from "@/types/feature";
+import { FeatureType } from "@/app/types/feature";
 
 export default function FeatureIcon({ name, size }: { name: FeatureType, size?: number }) {
   const defaultSize = 16;

@@ -6,12 +6,18 @@
 import type { Site, NewSite, SiteUpdate } from "../types/site";
 import { parseSite, parseSites } from "../utils/geojson";
 
+function getBaseUrl() {
+  if (typeof window !== 'undefined') return '';
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return `http://localhost:${process.env.PORT || 3000}`;
+}
+
 export class SiteService {
   /**
    * List all sites
    */
   async list(): Promise<Site[]> {
-    const response = await fetch("/api/sites");
+    const response = await fetch(`${getBaseUrl()}/api/sites`);
     if (!response.ok) throw new Error("Failed to fetch sites");
     const rawSites = await response.json();
     return parseSites(rawSites);
@@ -22,7 +28,7 @@ export class SiteService {
    */
   async get(siteId: string): Promise<Site | null> {
     try {
-      const response = await fetch(`/api/sites/${siteId}`);
+      const response = await fetch(`${getBaseUrl()}/api/sites/${siteId}`);
       if (response.status === 404) return null;
       if (!response.ok) throw new Error("Failed to fetch site");
       const raw = await response.json();
@@ -37,7 +43,7 @@ export class SiteService {
    * Create a new site
    */
   async create(siteData: NewSite): Promise<Site> {
-    const response = await fetch("/api/sites", {
+    const response = await fetch(`${getBaseUrl()}/api/sites`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(siteData),
@@ -51,7 +57,7 @@ export class SiteService {
    * Update an existing site
    */
   async update(siteId: string, updates: SiteUpdate): Promise<Site> {
-    const response = await fetch(`/api/sites/${siteId}`, {
+    const response = await fetch(`${getBaseUrl()}/api/sites/${siteId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updates),
@@ -65,7 +71,7 @@ export class SiteService {
    * Delete a site
    */
   async delete(siteId: string): Promise<void> {
-    const response = await fetch(`/api/sites/${siteId}`, {
+    const response = await fetch(`${getBaseUrl()}/api/sites/${siteId}`, {
       method: "DELETE",
     });
     if (!response.ok) throw new Error("Failed to delete site");

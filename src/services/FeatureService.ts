@@ -3,9 +3,9 @@
  * Encapsulates all feature-related business logic and API calls
  */
 
-import type { Feature, NewFeature, FeatureUpdate, FeatureType } from "../types/feature";
-import { parseFeature, parseFeatures } from "../utils/geojson";
-import { calculateMeasurements, type Measurements } from "../utils/measurements";
+import type { Feature, NewFeature, FeatureUpdate, FeatureType } from "@/app/types/feature";
+import { parseFeature, parseFeatures } from "@/app/utils/geojson";
+import { calculateMeasurements, type Measurements } from "@/app/utils/measurements";
 
 export class FeatureService {
   /**
