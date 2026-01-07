@@ -92,16 +92,19 @@ export default function SiteList() {
         }
       >
         {loading ? (
-          <div className="loading">Loading sites...</div>
+          <div className="p-5 text-center text-gray-600">Loading sites...</div>
         ) : sites.length === 0 ? (
-          <div className="empty-state">
+          <div className="p-5 text-center text-gray-600">
             <p>No sites yet</p>
-            <button onClick={() => setShowNewSiteDialog(true)}>
+            <button
+              onClick={() => setShowNewSiteDialog(true)}
+              className="mt-3 px-4 py-2 bg-blue-600 text-white border-none rounded cursor-pointer text-sm hover:bg-blue-700"
+            >
               Create Your First Site
             </button>
           </div>
         ) : (
-          <div className="site-list">
+          <div className="flex-1 overflow-y-auto">
             {sites.map((site) => (
               <SiteItem
                 key={site.id}

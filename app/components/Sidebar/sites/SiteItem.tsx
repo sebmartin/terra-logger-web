@@ -19,11 +19,13 @@ export default function SiteItem({
 }: SiteItemProps) {
   return (
     <div
-      className={`site-item ${isActive ? "active" : ""}`}
+      className={`px-5 py-3 flex items-center justify-between cursor-pointer border-b border-gray-100 transition-colors ${
+        isActive ? "bg-blue-50 border-l-4 border-l-blue-600" : "hover:bg-gray-50"
+      }`}
       onClick={() => onSelect(site)}
     >
-      <div className="site-info">
-        <div className="site-name">
+      <div className="flex-1">
+        <div className="font-medium text-gray-800 mb-1 flex items-center gap-1">
           {site.name}
           {isActive && (
             <IconButton
@@ -37,11 +39,11 @@ export default function SiteItem({
             />
           )}
         </div>
-        <div className="site-meta">
+        <div className="text-xs text-gray-500">
           {new Date(site.updated_at).toLocaleDateString()}
         </div>
       </div>
-      <div className="site-actions">
+      <div className="flex gap-1 items-center">
         <IconButton
           variant="action"
           onClick={(e) => {
