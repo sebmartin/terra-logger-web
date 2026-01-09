@@ -9,16 +9,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "prepare": "husky"
+    "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-collapsible": "^1.1.12",
     "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",
-    "@turf/turf": "^7.1.0",
+    "@turf/area": "^7.3.1",
+    "@turf/helpers": "^7.3.1",
+    "@turf/length": "^7.3.1",
     "@types/mapbox-gl": "^3.4.1",
     "better-sqlite3": "^12.5.0",
     "class-variance-authority": "^0.7.1",
@@ -33,30 +34,21 @@
     "tailwind-merge": "^3.4.0",
     "terra-draw": "^1.21.1",
     "terra-draw-mapbox-gl-adapter": "^1.2.0",
-    "uuid": "^10.0.0",
     "zod": "^3.24.1",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.18",
-    "@testing-library/react": "^16.3.1",
-    "@testing-library/user-event": "^14.6.1",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/better-sqlite3": "^7.6.12",
-    "@types/jsdom": "^27.0.0",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/uuid": "^10.0.0",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.1.0",
     "eslint-plugin-prettier": "^5.5.4",
-    "husky": "^9.1.7",
-    "jsdom": "^27.4.0",
-    "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
     "react-error-boundary": "^6.0.2",
     "tailwindcss": "^4.1.18",
-    "typescript": "^5.7.3",
-    "vitest": "^4.0.16"
+    "typescript": "^5.7.3"
   }
 }

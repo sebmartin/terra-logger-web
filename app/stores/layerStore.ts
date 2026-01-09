@@ -9,6 +9,8 @@ interface LayerStore {
   // State
   layers: Layer[];
   selectedLayerId: string | null;
+  loading: boolean;
+  initialized: boolean;
 
   // Computed getters
   visibleLayerIds: () => Set<string>;
@@ -29,6 +31,8 @@ export const useLayerStore = create<LayerStore>()(
         // Initial State
         layers: [],
         selectedLayerId: null,
+        loading: false,
+        initialized: false,
 
         // Computed getter
         visibleLayerIds: () => {
@@ -46,9 +50,15 @@ export const useLayerStore = create<LayerStore>()(
           if (!siteId) {
             set((state) => {
               state.layers = [];
+              state.loading = false;
+              state.initialized = false;
             });
             return;
           }
+
+          set((state) => {
+            state.loading = true;
+          });
 
           try {
             const loadedLayers = await layerService.listForSite(siteId);
@@ -58,16 +68,25 @@ export const useLayerStore = create<LayerStore>()(
             );
             set((state) => {
               state.layers = loadedLayers;
+              state.loading = false;
+              state.initialized = true;
             });
           } catch (err) {
             console.error("Failed to load layers for site:", err);
+            set((state) => {
+              state.loading = false;
+              state.initialized = true;
+            });
           }
         },
 
         toggleLayerVisibility: async (layerId) => {
           const { layers } = get();
           const layer = layers.find((l) => l.id === layerId);
-          if (!layer) return;
+          if (!layer) {
+            return;
+          }
+          console.log("[LayerStore] Toggling visibility for layer:", layerId);
 
           try {
             // Update in database using service

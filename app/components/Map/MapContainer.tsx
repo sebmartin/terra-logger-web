@@ -17,7 +17,7 @@ import { useSiteStore } from "../../stores/siteStore";
 import { useFeatureStore } from "../../stores/featureStore";
 import { useLayerStore } from "../../stores/layerStore";
 import { useTerraDrawSetup } from "../../hooks/useTerraDrawSetup";
-import { useTerraDrawSync } from "../../hooks/useTerraDrawSync";
+import { loadFeaturesIntoTerraDraw } from "../../hooks/useTerraDrawSync";
 import { useTerraDrawEvents } from "../../hooks/useTerraDrawEvents";
 import { useMapInteractions } from "../../hooks/useMapInteractions";
 import { MapView } from "./MapView";
@@ -46,14 +46,28 @@ export default function MapboxContainer() {
   const updateFeature = useFeatureStore((state) => state.updateFeature);
 
   const selectedLayerId = useLayerStore((state) => state.selectedLayerId);
-  const toggleLayerVisibility = useLayerStore((state) => state.toggleLayerVisibility);
-  const layers = useLayerStore((state) => state.layers);
+
+  // Keep features in a ref so callbacks always have latest
+  const featuresRef = useRef(features);
+  featuresRef.current = features;
 
   // Get map instance
   const map = mapRef.current?.getMap() || null;
 
-  // Setup Terra Draw with all modes
-  const { draw, ready: terraDrawReady, currentMode, setMode } = useTerraDrawSetup(map, mapReady);
+  // Setup Terra Draw with all modes (reinitializes when mapStyle changes)
+  const { draw, ready: terraDrawReady, currentMode, setMode } = useTerraDrawSetup(
+    map,
+    mapReady,
+    mapStyle,
+    (draw) => loadFeaturesIntoTerraDraw(draw, featuresRef.current)
+  );
+
+  // Reload features when they change
+  useEffect(() => {
+    if (draw && terraDrawReady) {
+      loadFeaturesIntoTerraDraw(draw, features);
+    }
+  }, [draw, terraDrawReady, features]);
 
   // Handle Terra Draw events (finish, select, change, deselect)
   const { selectedFeatureId, setSelectedFeatureId } = useTerraDrawEvents(
@@ -65,9 +79,6 @@ export default function MapboxContainer() {
     deleteFeature,
     setMode
   );
-
-  // Sync database features with Terra Draw
-  useTerraDrawSync(draw, terraDrawReady, features);
 
   // Handle keyboard shortcuts and site bounds
   useMapInteractions(
@@ -106,17 +117,6 @@ export default function MapboxContainer() {
       map.off("move", handleMove);
     };
   }, [map, updateMapState]);
-
-  // Auto-enable visibility when selecting a layer
-  useEffect(() => {
-    if (!selectedLayerId) return;
-
-    const layer = layers.find((l) => l.id === selectedLayerId);
-    if (layer && !layer.visible) {
-      toggleLayerVisibility(selectedLayerId);
-    }
-  }, [selectedLayerId, layers, toggleLayerVisibility]);
-
 
   // Check for Mapbox token
   if (!MAPBOX_ACCESS_TOKEN) {

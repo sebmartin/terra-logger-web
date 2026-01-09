@@ -1,9 +1,11 @@
 /**
  * Utility functions for calculating geometric measurements
- * Uses @turf/turf for accurate geospatial calculations
+ * Uses Turf.js for accurate geospatial calculations
  */
 
-import * as turf from "@turf/turf";
+import { lineString, polygon } from "@turf/helpers";
+import length from "@turf/length";
+import area from "@turf/area";
 import type { FeatureType } from "../types/feature";
 
 export interface DistanceMeasurements {
@@ -27,6 +29,53 @@ export interface Measurements {
 }
 
 /**
+ * Calculate distance from coordinate pairs (lng, lat)
+ */
+export function calculateDistance(coords: [number, number][]): DistanceMeasurements | null {
+  if (coords.length < 2) {
+    return null;
+  }
+
+  const line = lineString(coords);
+  const lengthKm = length(line, { units: "kilometers" });
+
+  return {
+    km: lengthKm,
+    miles: lengthKm * 0.621371,
+    meters: lengthKm * 1000,
+    feet: lengthKm * 3280.84,
+  };
+}
+
+/**
+ * Calculate area from coordinate pairs (lng, lat)
+ */
+export function calculateArea(coords: [number, number][]): AreaMeasurements | null {
+  if (coords.length < 3) {
+    return null;
+  }
+
+  // Close the polygon if not already closed
+  const closedCoords = [...coords];
+  const first = coords[0];
+  const last = coords[coords.length - 1];
+  if (first[0] !== last[0] || first[1] !== last[1]) {
+    closedCoords.push(first);
+  }
+
+  const poly = polygon([closedCoords]);
+  const areaSqm = area(poly);
+
+  return {
+    sqm: areaSqm,
+    sqkm: areaSqm / 1_000_000,
+    acres: areaSqm * 0.000247105,
+    hectares: areaSqm / 10_000,
+    sqft: areaSqm * 10.7639,
+  };
+}
+
+/**
  * Calculate measurements for a feature based on its geometry and type
  */
 export function calculateMeasurements(
@@ -37,26 +86,15 @@ export function calculateMeasurements(
 
   try {
     if (featureType === "Polyline") {
-      const line = turf.lineString(geoJSON.geometry.coordinates);
-      const lengthKm = turf.length(line, { units: "kilometers" });
-
-      measurements.distance = {
-        km: lengthKm,
-        miles: lengthKm * 0.621371,
-        meters: lengthKm * 1000,
-        feet: lengthKm * 3280.84,
-      };
+      const distance = calculateDistance(geoJSON.geometry.coordinates);
+      if (distance) {
+        measurements.distance = distance;
+      }
     } else if (featureType === "Polygon" || featureType === "Rectangle") {
-      const polygon = turf.polygon(geoJSON.geometry.coordinates);
-      const areaSqm = turf.area(polygon);
-
-      measurements.area = {
-        sqm: areaSqm,
-        sqkm: areaSqm / 1_000_000,
-        acres: areaSqm * 0.000247105,
-        hectares: areaSqm / 10_000,
-        sqft: areaSqm * 10.7639,
-      };
+      const areaResult = calculateArea(geoJSON.geometry.coordinates[0]);
+      if (areaResult) {
+        measurements.area = areaResult;
+      }
     }
   } catch (error) {
     console.error("Failed to calculate measurements:", error);

@@ -8,6 +8,7 @@ import SiteItem from "./SiteItem";
 import NewSiteDialog from "./NewSiteDialog";
 import BoundsSelector from "../../BoundsSelector/BoundsSelector";
 import { useSiteStore } from "../../../stores/siteStore";
+import { Map } from "lucide-react";
 
 export default function SiteList() {
   const [showNewSiteDialog, setShowNewSiteDialog] = useState(false);
@@ -19,6 +20,7 @@ export default function SiteList() {
   const selectedSite = useSiteStore((state) => state.selectedSite());
   const setSelectedSiteId = useSiteStore((state) => state.setSelectedSiteId);
   const loading = useSiteStore((state) => state.loading);
+  const initialized = useSiteStore((state) => state.initialized);
   const createSite = useSiteStore((state) => state.createSite);
   const updateSite = useSiteStore((state) => state.updateSite);
   const deleteSite = useSiteStore((state) => state.deleteSite);
@@ -91,14 +93,22 @@ export default function SiteList() {
           />
         }
       >
-        {loading ? (
-          <div className="p-5 text-center text-gray-600">Loading sites...</div>
+        {!initialized || loading ? (
+          <div className="px-4 py-6 text-center">
+            <div className="inline-flex items-center gap-2 text-slate-500">
+              <div className="w-4 h-4 border-2 border-slate-300 border-t-blue-600 rounded-full animate-spin" />
+              <span className="text-sm font-medium">Loading sites...</span>
+            </div>
+          </div>
         ) : sites.length === 0 ? (
-          <div className="p-5 text-center text-gray-600">
-            <p>No sites yet</p>
+          <div className="px-4 py-6 text-center">
+            <div className="mb-3 flex justify-center">
+              <Map size={40} className="text-slate-400" strokeWidth={1.5} />
+            </div>
+            <p className="text-sm text-slate-600 mb-3 font-medium">No sites yet</p>
             <button
               onClick={() => setShowNewSiteDialog(true)}
-              className="mt-3 px-4 py-2 bg-blue-600 text-white border-none rounded cursor-pointer text-sm hover:bg-blue-700"
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Create Your First Site
             </button>

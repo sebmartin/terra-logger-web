@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { IconButton } from "../../common";
+import { Badge } from "../../ui/badge";
 import CollapsibleSection from "../CollapsibleSection";
 import LayerItem from "./LayerItem";
 import NewLayerDialog from "./NewLayerDialog";
 import { useLayerStore } from "../../../stores/layerStore";
 import { useSiteStore } from "../../../stores/siteStore";
+import { Layers } from "lucide-react";
 
 export default function LayerList() {
   const [showNewLayerDialog, setShowNewLayerDialog] = useState(false);
@@ -57,20 +59,24 @@ export default function LayerList() {
       <CollapsibleSection
         title="Layers"
         headerActions={
-          <div className="header-actions">
-            <span className="count">{layers.length}</span>
+          <>
+            <Badge variant="secondary" className="h-8 min-w-[2rem] px-3 justify-center font-semibold">{layers.length}</Badge>
             <IconButton
               onClick={() => setShowNewLayerDialog(true)}
               title="New Layer"
               icon="+"
             />
-          </div>
+          </>
         }
       >
-        <div className="layer-list">
+        <div className="flex flex-col">
           {layers.length === 0 ? (
-            <div className="empty-state-small">
-              <p>No layers yet. Create a layer to organize your features.</p>
+            <div className="px-4 py-6 text-center">
+              <div className="mb-3 flex justify-center">
+                <Layers size={40} className="text-slate-400" strokeWidth={1.5} />
+              </div>
+              <p className="text-sm text-slate-600 font-medium">No layers yet</p>
+              <p className="text-xs text-slate-500 mt-2">Create a layer to organize your features</p>
             </div>
           ) : (
             layers.map((layer) => (

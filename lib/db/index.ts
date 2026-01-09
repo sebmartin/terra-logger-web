@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { promises as fs } from "node:fs";
 import { SCHEMA, DBSite, DBLayer, DBFeature, DBMeasurement } from "./schema";
@@ -56,7 +56,7 @@ export class DatabaseService {
     bounds: any;
   }): DBSite {
     const now = Date.now();
-    const id = uuidv4();
+    const id = randomUUID();
 
     const stmt = this.db.prepare(`
       INSERT INTO sites (id, name, description, bounds, created_at, updated_at)
@@ -154,7 +154,7 @@ export class DatabaseService {
     color?: string;
   }): DBLayer {
     const now = Date.now();
-    const id = uuidv4();
+    const id = randomUUID();
 
     const stmt = this.db.prepare(`
       INSERT INTO layers (id, site_id, name, description, visible, color, created_at, updated_at)
@@ -251,7 +251,7 @@ export class DatabaseService {
     },
   ): DBFeature {
     const now = Date.now();
-    const id = uuidv4();
+    const id = randomUUID();
 
     // Determine if this is a site or layer feature
     const siteId = feature.site_id || (feature.layer_id ? null : parentId);
@@ -382,7 +382,7 @@ export class DatabaseService {
     },
   ): DBMeasurement {
     const now = Date.now();
-    const id = uuidv4();
+    const id = randomUUID();
 
     const stmt = this.db.prepare(`
       INSERT INTO measurements (id, layer_id, feature_id, type, value, unit, geometry, label, created_at)

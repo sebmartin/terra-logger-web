@@ -26,16 +26,15 @@ export const MapView = forwardRef<MapRef, MapViewProps>(
     const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 
     return (
-        <Map
-          ref={ref}
-          initialViewState={initialViewState}
-          className="w-full h-full"
-          mapStyle={mapStyle}
-          mapboxAccessToken={mapboxAccessToken}
-          cursor={currentMode === "select" ? "default" : "crosshair"}
-          attributionControl={false}
-          onLoad={onLoad}
-        >
+      <Map
+        ref={ref}
+        initialViewState={initialViewState}
+        mapStyle={mapStyle}
+        mapboxAccessToken={mapboxAccessToken}
+        cursor={currentMode === "select" ? "default" : "crosshair"}
+        attributionControl={false}
+        onLoad={onLoad}
+      >
         {children}
       </Map>
     );

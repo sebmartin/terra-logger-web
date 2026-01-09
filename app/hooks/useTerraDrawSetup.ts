@@ -10,6 +10,7 @@ import {
   TerraDrawCircleMode,
 } from "terra-draw";
 import { TerraDrawMapboxGLAdapter } from "terra-draw-mapbox-gl-adapter";
+import { polygon } from "@turf/helpers";
 
 /**
  * Custom hook to initialize and manage Terra Draw instance
@@ -17,7 +18,9 @@ import { TerraDrawMapboxGLAdapter } from "terra-draw-mapbox-gl-adapter";
  */
 export function useTerraDrawSetup(
   map: MapboxMap | null,
-  mapReady: boolean
+  mapReady: boolean,
+  mapStyle: string,
+  onReady?: (draw: TerraDraw) => void
 ): {
   draw: TerraDraw | null;
   ready: boolean;
@@ -31,23 +34,34 @@ export function useTerraDrawSetup(
   useEffect(() => {
     if (!mapReady || !map) return;
 
-    // Clean up existing Terra Draw instance if it exists
-    if (terraDrawRef.current) {
-      terraDrawRef.current.stop();
-      terraDrawRef.current = null;
-      setReady(false);
-    }
-
     const initializeTerraDrawWhenReady = () => {
+      // Clean up existing instance
+      if (terraDrawRef.current) {
+        try {
+          terraDrawRef.current.stop();
+        } catch (error) {
+          // Layers already destroyed by Mapbox
+        }
+        terraDrawRef.current = null;
+        setReady(false);
+      }
+
       // Initialize Terra Draw with all drawing and editing modes
       const draw = new TerraDraw({
         adapter: new TerraDrawMapboxGLAdapter({ map }),
         modes: [
           new TerraDrawSelectMode({
             flags: {
-              arbitary: {
-                feature: {},
-              },
+              polygon: {
+                feature: {
+                  draggable: true,
+                  coordinates: {
+                    midpoints: true,
+                    draggable: true,
+                    deletable: true,
+                  },
+                }
+              }
             },
             pointerDistance: 10,
           }),
@@ -68,29 +82,24 @@ export function useTerraDrawSetup(
       setCurrentMode("select");
       terraDrawRef.current = draw;
       setReady(true);
+      onReady?.(draw);
     };
 
-    // Wait for style to be fully loaded before initializing Terra Draw
-    const initWhenStyleReady = () => {
-      if (map.isStyleLoaded()) {
-        initializeTerraDrawWhenReady();
-      } else {
-        map.once("style.load", initializeTerraDrawWhenReady);
-      }
-    };
-
-    // Use idle event to ensure map is fully initialized
-    if (map.isStyleLoaded() && map.loaded()) {
+    // Configure Terra Draw once the map style is fully loaded
+    // We also need to reconfigure when the map style changes
+    if (map.isStyleLoaded()) {
       initializeTerraDrawWhenReady();
-    } else {
-      map.once("idle", initWhenStyleReady);
     }
+    map.on("style.load", initializeTerraDrawWhenReady);
 
     return () => {
       map.off("style.load", initializeTerraDrawWhenReady);
-      map.off("idle", initWhenStyleReady);
       if (terraDrawRef.current) {
-        terraDrawRef.current.stop();
+        try {
+          terraDrawRef.current.stop();
+        } catch (error) {
+          // Ignore cleanup errors
+        }
         terraDrawRef.current = null;
       }
     };
@@ -99,6 +108,8 @@ export function useTerraDrawSetup(
   const setMode = (mode: string) => {
     const draw = terraDrawRef.current;
     if (!draw) return;
+
+    console.log(`[Terra Draw] Setting mode to: ${mode}`);
 
     draw.setMode(mode);
     setCurrentMode(mode);

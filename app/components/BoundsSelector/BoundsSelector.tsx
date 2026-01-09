@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useMapStore } from "../../stores/mapStore";
 import type { SiteBounds } from "../../types/site";
-import "./BoundsSelector.css";
 
 interface BoundsSelectorProps {
   initialBounds?: SiteBounds;
@@ -67,54 +66,59 @@ export default function BoundsSelector({
   };
 
   return createPortal(
-    <div className="bounds-selector-overlay">
-      <div className="bounds-selector-frame">
-        <div className="bounds-selector-border bounds-top" />
-        <div className="bounds-selector-border bounds-right" />
-        <div className="bounds-selector-border bounds-bottom" />
-        <div className="bounds-selector-border bounds-left" />
+    <div className="absolute inset-0 z-[1000] pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Dark overlay borders */}
+        <div className="absolute top-0 left-0 right-0 h-[60px] bg-black/50 pointer-events-none" />
+        <div className="absolute top-[60px] right-0 bottom-[60px] w-[60px] bg-black/50 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-[60px] bg-black/50 pointer-events-none" />
+        <div className="absolute top-[60px] left-0 bottom-[60px] w-[60px] bg-black/50 pointer-events-none" />
 
-        <div className="bounds-selector-corner corner-tl" />
-        <div className="bounds-selector-corner corner-tr" />
-        <div className="bounds-selector-corner corner-bl" />
-        <div className="bounds-selector-corner corner-br" />
+        {/* Corner markers */}
+        <div className="absolute top-[60px] left-[60px] w-5 h-5 border-3 border-blue-600 border-r-0 border-b-0 pointer-events-none" />
+        <div className="absolute top-[60px] right-[60px] w-5 h-5 border-3 border-blue-600 border-l-0 border-b-0 pointer-events-none" />
+        <div className="absolute bottom-[60px] left-[60px] w-5 h-5 border-3 border-blue-600 border-r-0 border-t-0 pointer-events-none" />
+        <div className="absolute bottom-[60px] right-[60px] w-5 h-5 border-3 border-blue-600 border-l-0 border-t-0 pointer-events-none" />
       </div>
 
-      <div className="bounds-selector-controls">
-        <div className="bounds-selector-header">
-          <h3>{title}</h3>
-          <p>
+      <div className="absolute top-5 left-1/2 -translate-x-1/2 bg-white p-5 rounded-lg shadow-lg min-w-[400px] max-w-[500px] pointer-events-auto z-[1001]">
+        <div className="mb-4">
+          <h3 className="m-0 mb-2 text-lg font-semibold text-gray-800">{title}</h3>
+          <p className="m-0 text-sm text-gray-600 leading-relaxed">
             Pan and zoom the map to frame your site area within the viewport
           </p>
         </div>
 
         {currentBounds && (
-          <div className="bounds-selector-info">
-            <div className="bounds-coord">
-              <span className="label">North:</span>
-              <span className="value">{currentBounds.north.toFixed(6)}°</span>
+          <div className="bg-gray-50 p-3 rounded mb-4 grid grid-cols-2 gap-2 text-[13px] font-mono">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 font-semibold">North:</span>
+              <span className="text-gray-800">{currentBounds.north.toFixed(6)}°</span>
             </div>
-            <div className="bounds-coord">
-              <span className="label">South:</span>
-              <span className="value">{currentBounds.south.toFixed(6)}°</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 font-semibold">South:</span>
+              <span className="text-gray-800">{currentBounds.south.toFixed(6)}°</span>
             </div>
-            <div className="bounds-coord">
-              <span className="label">East:</span>
-              <span className="value">{currentBounds.east.toFixed(6)}°</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 font-semibold">East:</span>
+              <span className="text-gray-800">{currentBounds.east.toFixed(6)}°</span>
             </div>
-            <div className="bounds-coord">
-              <span className="label">West:</span>
-              <span className="value">{currentBounds.west.toFixed(6)}°</span>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 font-semibold">West:</span>
+              <span className="text-gray-800">{currentBounds.west.toFixed(6)}°</span>
             </div>
           </div>
         )}
 
-        <div className="bounds-selector-actions">
-          <button className="btn-secondary" onClick={onCancel}>
+        <div className="flex gap-2 justify-end">
+          <button
+            className="px-4 py-2 border border-gray-300 bg-white rounded transition-colors hover:bg-gray-50 text-sm"
+            onClick={onCancel}
+          >
             Cancel
           </button>
           <button
-            className="btn-primary"
+            className="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded transition-colors hover:bg-blue-700 disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed text-sm"
             onClick={handleCapture}
             disabled={!currentBounds}
           >

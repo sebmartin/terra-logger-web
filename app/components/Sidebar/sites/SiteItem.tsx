@@ -1,4 +1,4 @@
-import { Pencil, X, Locate } from "lucide-react";
+import { Pencil, X, Locate, Calendar } from "lucide-react";
 import type { Site } from "../../../types/site";
 import { IconButton } from "../../common";
 
@@ -19,14 +19,16 @@ export default function SiteItem({
 }: SiteItemProps) {
   return (
     <div
-      className={`px-5 py-3 flex items-center justify-between cursor-pointer border-b border-gray-100 transition-colors ${
-        isActive ? "bg-blue-50 border-l-4 border-l-blue-600" : "hover:bg-gray-50"
+      className={`mx-2 my-1 px-3 py-2.5 rounded-lg flex items-center justify-between cursor-pointer transition-all duration-200 ${
+        isActive
+          ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-blue-600 shadow-sm"
+          : "hover:bg-slate-50 hover:shadow-sm"
       }`}
       onClick={() => onSelect(site)}
     >
-      <div className="flex-1">
-        <div className="font-medium text-gray-800 mb-1 flex items-center gap-1">
-          {site.name}
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold text-sm text-slate-800 mb-1 flex items-center gap-2">
+          <span className="truncate">{site.name}</span>
           {isActive && (
             <IconButton
               variant="action"
@@ -39,11 +41,12 @@ export default function SiteItem({
             />
           )}
         </div>
-        <div className="text-xs text-gray-500">
-          {new Date(site.updated_at).toLocaleDateString()}
+        <div className="text-xs text-slate-500 flex items-center gap-1.5">
+          <Calendar size={12} />
+          <span>{new Date(site.updated_at).toLocaleDateString()}</span>
         </div>
       </div>
-      <div className="flex gap-1 items-center">
+      <div className="flex gap-1.5 items-center ml-3">
         <IconButton
           variant="action"
           onClick={(e) => {

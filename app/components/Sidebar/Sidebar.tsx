@@ -6,14 +6,17 @@ import FeatureList from "./features/FeatureList";
 
 export default function Sidebar() {
   return (
-    <div className="w-80 h-screen bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-transform duration-300 relative z-10">
-      <div className="px-5 py-5 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-800 m-0">Terra Logger</h2>
+    <div className="w-96 h-screen bg-gradient-to-b from-slate-50 to-slate-100 border-r border-slate-200 flex flex-col overflow-hidden shadow-xl">
+      <div className="px-5 py-4 border-b border-slate-200/80 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 flex-none shadow-md">
+        <h2 className="text-xl font-bold text-white tracking-tight">Terra Logger</h2>
+        <p className="text-blue-100 text-xs mt-0.5">Geospatial Planning Tool</p>
       </div>
 
-      <SiteList />
-      <LayerList />
-      <FeatureList />
+      <div className="flex-1 overflow-y-auto space-y-0">
+        <SiteList />
+        <LayerList />
+        <FeatureList />
+      </div>
     </div>
   );
 }

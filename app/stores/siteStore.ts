@@ -9,6 +9,7 @@ interface SiteStore {
   sites: Site[];
   selectedSiteId: string | null;
   loading: boolean;
+  initialized: boolean;
   error: Error | null;
 
   // Computed getters
@@ -29,6 +30,7 @@ export const useSiteStore = create<SiteStore>()(
       sites: [],
       selectedSiteId: null,
       loading: false,
+      initialized: false,
       error: null,
 
       // Computed getter
@@ -54,12 +56,14 @@ export const useSiteStore = create<SiteStore>()(
           set((state) => {
             state.sites = loadedSites;
             state.loading = false;
+            state.initialized = true;
           });
         } catch (err) {
           console.error("Failed to load sites:", err);
           set((state) => {
             state.error = err as Error;
             state.loading = false;
+            state.initialized = true;
           });
         }
       },
