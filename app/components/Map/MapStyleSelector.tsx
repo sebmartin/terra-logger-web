@@ -1,4 +1,14 @@
-'use client';
+"use client";
+
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui";
+import { MapIcon } from "lucide-react";
 
 export const MAP_STYLES = {
   topology: "mapbox://styles/sebmartin/cl0daly1b002j15ldl6d0xcmh",
@@ -12,36 +22,53 @@ interface MapStyleSelectorProps {
   onStyleChange: (style: string) => void;
 }
 
-/**
- * Map style selector component
- * Provides UI for selecting base map styles
- */
-export function MapStyleSelector({
-  currentStyle,
-  onStyleChange,
-}: MapStyleSelectorProps) {
-  const getCurrentStyleKey = () => {
-    return (
-      (Object.keys(MAP_STYLES).find(
-        (key) => MAP_STYLES[key as keyof typeof MAP_STYLES] === currentStyle
-      ) as keyof typeof MAP_STYLES) || "topology"
-    );
-  };
-
+export function MapStyleSelector({ currentStyle, onStyleChange }: MapStyleSelectorProps) {
   return (
-    <div className="absolute top-2.5 left-2.5 bg-white px-3 py-2 rounded shadow z-10">
-      <select
-        value={getCurrentStyleKey()}
-        onChange={(e) =>
-          onStyleChange(MAP_STYLES[e.target.value as keyof typeof MAP_STYLES])
-        }
-        className="border-none outline-none cursor-pointer text-sm font-sans"
-      >
-        <option value="topology">Topology (Custom)</option>
-        <option value="satellite">Satellite</option>
-        <option value="outdoors">Outdoors</option>
-        <option value="streets">Streets</option>
-      </select>
-    </div>
+    <span className="mapboxgl-ctrl absolute flex top-46 right-2.5 z-10">
+      {/* border-border bg-background rounded-sm w-7 h-7 justify-center items-center */}
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <span className="mapboxgl-ctrl-icon">
+            <MapIcon size={20} />
+          </span>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>Base Map</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            checked={currentStyle === MAP_STYLES.topology}
+            onCheckedChange={(checked) =>
+              onStyleChange(checked ? MAP_STYLES.topology : currentStyle)
+            }
+          >
+            Topology (Custom)
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={currentStyle === MAP_STYLES.satellite}
+            onCheckedChange={(checked) =>
+              onStyleChange(checked ? MAP_STYLES.satellite : currentStyle)
+            }
+          >
+            Satellite
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={currentStyle === MAP_STYLES.outdoors}
+            onCheckedChange={(checked) =>
+              onStyleChange(checked ? MAP_STYLES.outdoors : currentStyle)
+            }
+          >
+            Outdoors
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={currentStyle === MAP_STYLES.streets}
+            onCheckedChange={(checked) =>
+              onStyleChange(checked ? MAP_STYLES.streets : currentStyle)
+            }
+          >
+            Streets
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </span>
   );
 }

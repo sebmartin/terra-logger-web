@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Mapbox GL JS Container
@@ -11,22 +11,26 @@
  */
 
 import { useRef, useEffect, useState } from "react";
-import { MapRef } from "react-map-gl/mapbox";
-import { useMapStore } from "../../stores/mapStore";
-import { useSiteStore } from "../../stores/siteStore";
-import { useFeatureStore } from "../../stores/featureStore";
-import { useLayerStore } from "../../stores/layerStore";
-import { useTerraDrawSetup } from "../../hooks/useTerraDrawSetup";
-import { loadFeaturesIntoTerraDraw } from "../../hooks/useTerraDrawSync";
-import { useTerraDrawEvents } from "../../hooks/useTerraDrawEvents";
-import { useMapInteractions } from "../../hooks/useMapInteractions";
+import {
+  MapRef,
+  NavigationControl,
+  GeolocateControl,
+  ScaleControl,
+  FullscreenControl,
+} from "react-map-gl/mapbox";
+import { useMapStore } from "@/app/stores/mapStore";
+import { useSiteStore } from "@/app/stores/siteStore";
+import { useFeatureStore } from "@/app/stores/featureStore";
+import { useLayerStore } from "@/app/stores/layerStore";
+import { useTerraDrawSetup } from "@/app/hooks/useTerraDrawSetup";
+import { loadFeaturesIntoTerraDraw } from "@/app/hooks/useTerraDrawSync";
+import { useTerraDrawEvents } from "@/app/hooks/useTerraDrawEvents";
+import { useMapInteractions } from "@/app/hooks/useMapInteractions";
 import { MapView } from "./MapView";
-import { MapControls } from "./MapControls";
 import { MapStyleSelector, MAP_STYLES } from "./MapStyleSelector";
 import { DrawingToolbar } from "./DrawingToolbar";
 
 const MAPBOX_ACCESS_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
-
 
 export default function MapboxContainer() {
   const mapRef = useRef<MapRef>(null);
@@ -55,11 +59,13 @@ export default function MapboxContainer() {
   const map = mapRef.current?.getMap() || null;
 
   // Setup Terra Draw with all modes (reinitializes when mapStyle changes)
-  const { draw, ready: terraDrawReady, currentMode, setMode } = useTerraDrawSetup(
-    map,
-    mapReady,
-    mapStyle,
-    (draw) => loadFeaturesIntoTerraDraw(draw, featuresRef.current)
+  const {
+    draw,
+    ready: terraDrawReady,
+    currentMode,
+    setMode,
+  } = useTerraDrawSetup(map, mapReady, (draw) =>
+    loadFeaturesIntoTerraDraw(draw, featuresRef.current)
   );
 
   // Reload features when they change
@@ -153,13 +159,11 @@ export default function MapboxContainer() {
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
-      <MapView
-        ref={mapRef}
-        mapStyle={mapStyle}
-        currentMode={currentMode}
-        onLoad={() => setMapReady(true)}
-      >
-        <MapControls />
+      <MapView ref={mapRef} mapStyle={mapStyle} onLoad={() => setMapReady(true)}>
+        <NavigationControl position="top-right" />
+        <GeolocateControl position="top-right" />
+        <ScaleControl position="bottom-left" />
+        <FullscreenControl position="top-right" />
         <MapStyleSelector currentStyle={mapStyle} onStyleChange={setMapStyle} />
         <DrawingToolbar
           currentMode={currentMode}

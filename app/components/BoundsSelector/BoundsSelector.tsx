@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useMapStore } from "../../stores/mapStore";
-import type { SiteBounds } from "../../types/site";
+import { useMapStore } from "@/app/stores/mapStore";
+import type { SiteBounds } from "@/app/types/site";
 
 interface BoundsSelectorProps {
   initialBounds?: SiteBounds;

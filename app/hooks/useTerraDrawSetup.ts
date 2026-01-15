@@ -10,7 +10,6 @@ import {
   TerraDrawCircleMode,
 } from "terra-draw";
 import { TerraDrawMapboxGLAdapter } from "terra-draw-mapbox-gl-adapter";
-import { polygon } from "@turf/helpers";
 
 /**
  * Custom hook to initialize and manage Terra Draw instance
@@ -19,7 +18,6 @@ import { polygon } from "@turf/helpers";
 export function useTerraDrawSetup(
   map: MapboxMap | null,
   mapReady: boolean,
-  mapStyle: string,
   onReady?: (draw: TerraDraw) => void
 ): {
   draw: TerraDraw | null;

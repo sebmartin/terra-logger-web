@@ -55,7 +55,7 @@ export function useMapInteractions(
           [bounds.west, bounds.south],
           [bounds.east, bounds.north],
         ],
-        { padding: 50, duration: 1000 }
+        { padding: {left: 240, top: 50, right: 50, bottom: 50}, duration: 1000 }
       );
     }
   }, [selectedSite, mapRef]);

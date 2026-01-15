@@ -2,11 +2,9 @@
 
 import { forwardRef } from "react";
 import Map, { MapRef } from "react-map-gl/mapbox";
-import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapViewProps {
   mapStyle: string;
-  currentMode: string | null;
   onLoad: () => void;
   children?: React.ReactNode;
 }
@@ -16,7 +14,7 @@ interface MapViewProps {
  * Handles map rendering with react-map-gl
  */
 export const MapView = forwardRef<MapRef, MapViewProps>(
-  ({ mapStyle, currentMode, onLoad, children }, ref) => {
+  ({ mapStyle, onLoad, children }, ref) => {
     const initialViewState = {
       longitude: -98.5795,
       latitude: 39.8283,
@@ -31,7 +29,6 @@ export const MapView = forwardRef<MapRef, MapViewProps>(
         initialViewState={initialViewState}
         mapStyle={mapStyle}
         mapboxAccessToken={mapboxAccessToken}
-        cursor={currentMode === "select" ? "default" : "crosshair"}
         attributionControl={false}
         onLoad={onLoad}
       >
