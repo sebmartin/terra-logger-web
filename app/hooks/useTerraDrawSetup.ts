@@ -46,11 +46,27 @@ export function useTerraDrawSetup(
 
       // Initialize Terra Draw with all drawing and editing modes
       const draw = new TerraDraw({
-        adapter: new TerraDrawMapboxGLAdapter({ map }),
+        tracked: true,
+        adapter: new TerraDrawMapboxGLAdapter({ 
+          map,
+          coordinatePrecision: 9,
+        }),
         modes: [
           new TerraDrawSelectMode({
             flags: {
               polygon: {
+                feature: {
+                  scaleable: true,
+                  rotateable: true,
+                  draggable: true,
+                  coordinates: {
+                    midpoints: true,
+                    draggable: true,
+                    deletable: true,
+                  },
+                },
+              },
+              linestring: {
                 feature: {
                   draggable: true,
                   coordinates: {
@@ -58,10 +74,27 @@ export function useTerraDrawSetup(
                     draggable: true,
                     deletable: true,
                   },
-                }
-              }
+                },
+              },
+              point: {
+                feature: {
+                  draggable: true,
+                },
+              },
+              circle: {
+                feature: {
+                  draggable: true,
+                },
+              },
+              rectangle: {
+                feature: {
+                  draggable: true,
+                  coordinates: {
+                    resizable: "opposite",
+                  },
+                },
+              },
             },
-            pointerDistance: 10,
           }),
           new TerraDrawPointMode(),
           new TerraDrawLineStringMode({
@@ -75,20 +108,31 @@ export function useTerraDrawSetup(
         ],
       });
 
+      // Store ref BEFORE starting so it's available immediately
+      terraDrawRef.current = draw;
+      
+      // Start TerraDraw - this begins listening to map events
+      console.log("[useTerraDrawSetup] Calling draw.start()");
       draw.start();
+      console.log("[useTerraDrawSetup] draw.start() completed, setting mode to select");
       draw.setMode("select");
       setCurrentMode("select");
-      terraDrawRef.current = draw;
+      
+      // Set ready state and notify - this triggers a re-render
+      console.log("[useTerraDrawSetup] TerraDraw ready, calling onReady callback");
       setReady(true);
       onReady?.(draw);
     };
 
     // Configure Terra Draw once the map style is fully loaded
     // We also need to reconfigure when the map style changes
+    // Always listen for style.load first, then check if already loaded
+    // This avoids a race condition where both fire
+    map.on("style.load", initializeTerraDrawWhenReady);
+    
     if (map.isStyleLoaded()) {
       initializeTerraDrawWhenReady();
     }
-    map.on("style.load", initializeTerraDrawWhenReady);
 
     return () => {
       map.off("style.load", initializeTerraDrawWhenReady);

@@ -42,7 +42,7 @@
     "react-map-gl": "^8.1.0",
     "react-resizable-panels": "^4.4.1",
     "tailwind-merge": "^3.4.0",
-    "terra-draw": "^1.21.1",
+    "terra-draw": "^1.23.0",
     "terra-draw-mapbox-gl-adapter": "^1.2.0",
     "zod": "^3.24.1",
     "zustand": "^5.0.9"

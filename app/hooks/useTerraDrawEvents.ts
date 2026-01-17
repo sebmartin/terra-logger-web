@@ -30,16 +30,18 @@ export function useTerraDrawEvents(
     // Handle feature completion - save newly drawn features to DB
     const handleFinish = (id: string | number, context: any) => {
       // Only save if this is a draw action (not drag/resize)
+      console.log("[useTerraDrawEvents] Finished drawing:", id, context);
+      
       if (context.action !== "draw") return;
 
       if (!selectedLayerId) {
         console.warn("No layer selected");
         return;
       }
-
+      
       const snapshot = draw.getSnapshot();
       const feature = snapshot.find((f) => f.id === id);
-
+      
       if (feature) {
         // Map Terra Draw geometry types to our feature types
         let featureType: any = "Marker";
@@ -65,6 +67,7 @@ export function useTerraDrawEvents(
               ...feature,
               properties: { ...feature.properties, dbId: savedFeature.id },
             };
+            console.log("[useTerraDrawEvents] Updating Terra Draw feature:", updatedFeature);
             draw.removeFeatures([id]);
             draw.addFeatures([updatedFeature as any]);
             // Return to select mode
@@ -73,6 +76,8 @@ export function useTerraDrawEvents(
           .catch((error) => {
             console.error("Failed to save feature:", error);
           });
+      } else {
+        console.error("[useTerraDrawEvents] Finished drawing feature, it could not be saved because it was not found in the snapshot:", id);
       }
     };
 
@@ -81,6 +86,7 @@ export function useTerraDrawEvents(
       const snapshot = draw.getSnapshot();
       const feature = snapshot.find((f: any) => f.id === id);
       if (feature?.properties?.dbId) {
+        console.log("[useTerraDrawEvents] Selecting feature:", feature);
         setSelectedFeatureId(String(feature.properties.dbId));
       }
     };
@@ -94,37 +100,37 @@ export function useTerraDrawEvents(
     const handleChange = (ids: (string | number)[], changeType: string, context: any) => {
       const snapshot = draw.getSnapshot();
 
-      if (changeType === "delete") {
-        // Handle deletions
-        ids.forEach((_featureId) => {
-          // Find which database feature was deleted by checking the snapshot before deletion
-          const dbId = selectedFeatureId;
-          if (dbId) {
-            onFeatureDelete(dbId).catch((error) => {
-              console.error(`Failed to delete feature ${dbId}:`, error);
-            });
-          }
-        });
-      } else if (changeType === "update") {
-        // Only update geometry if geometry changed (not just properties)
-        if (context?.target === "geometry") {
-          ids.forEach((featureId) => {
-            const feature = snapshot.find((f) => f.id === featureId);
-            if (feature?.properties?.dbId) {
-              const dbId = String(feature.properties.dbId);
-              onFeatureUpdate(dbId, {
-                geometry: feature.geometry,
-              })
-                .then(() => {
-                  console.log(`Feature ${dbId} geometry updated in database`);
-                })
-                .catch((error) => {
-                  console.error(`Failed to update feature ${dbId}:`, error);
-                });
-            }
+      if (changeType === "delete") {      
+        const dbIds = snapshot.filter((f) => f.id && ids.includes(f.id)).map((f) => f.properties?.dbId);
+        dbIds.forEach((dbId) => {
+          console.log("[useTerraDrawEvents] Deleting feature:", dbId, context, changeType);
+          onFeatureDelete(String(dbId)).catch((error) => {
+            console.error(`Failed to delete feature ${dbId}:`, error);
           });
-        }
-      }
+        });
+      } 
+      // TODO: handle this in the finish event. This triggers for every minor change like dragging
+      // else if (changeType === "update") {
+      //   // Only update geometry if geometry changed (not just properties)
+      //   if (context?.target === "geometry") {
+      //     ids.forEach((featureId) => {
+      //       const feature = snapshot.find((f) => f.id === featureId);
+      //       if (feature?.properties?.dbId) {
+      //         console.log("[useTerraDrawEvents] Updating feature:", feature, context);
+      //         const dbId = String(feature.properties.dbId);
+      //         onFeatureUpdate(dbId, {
+      //           geometry: feature.geometry,
+      //         })
+      //           .then(() => {
+      //             console.log(`Feature ${dbId} geometry updated in database`);
+      //           })
+      //           .catch((error) => {
+      //             console.error(`Failed to update feature ${dbId}:`, error);
+      //           });
+      //       }
+      //     });
+      //   }
+      // }
     };
 
     draw.on("finish", handleFinish);

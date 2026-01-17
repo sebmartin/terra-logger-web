@@ -64,16 +64,18 @@ export default function MapboxContainer() {
     ready: terraDrawReady,
     currentMode,
     setMode,
-  } = useTerraDrawSetup(map, mapReady, (draw) =>
-    loadFeaturesIntoTerraDraw(draw, featuresRef.current)
-  );
+  } = useTerraDrawSetup(map, mapReady, (draw) => {
+    setDraw(draw);
+    loadFeaturesIntoTerraDraw(draw, featuresRef.current);
+  });
 
-  // Reload features when they change
+  // Reload features when draw/terraDrawReady initialize
   useEffect(() => {
+    console.log("[MapContainer] Reloading features");
     if (draw && terraDrawReady) {
-      loadFeaturesIntoTerraDraw(draw, features);
+      loadFeaturesIntoTerraDraw(draw, featuresRef.current);
     }
-  }, [draw, terraDrawReady, features]);
+  }, [draw, terraDrawReady]);
 
   // Handle Terra Draw events (finish, select, change, deselect)
   const { selectedFeatureId, setSelectedFeatureId } = useTerraDrawEvents(
@@ -95,18 +97,6 @@ export default function MapboxContainer() {
     selectedSite,
     deleteFeature
   );
-
-  // Store map instance in Zustand when ready
-  useEffect(() => {
-    if (!map) return;
-    setMap(map as any);
-  }, [map, setMap]);
-
-  // Store Terra Draw instance in Zustand
-  useEffect(() => {
-    if (!draw) return;
-    setDraw(draw);
-  }, [draw, setDraw]);
 
   // Update map state on move/zoom
   useEffect(() => {
@@ -159,7 +149,15 @@ export default function MapboxContainer() {
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
-      <MapView ref={mapRef} mapStyle={mapStyle} onLoad={() => setMapReady(true)}>
+      <MapView
+        ref={mapRef}
+        mapStyle={mapStyle}
+        onLoad={() => {
+          setMapReady(true);
+          const map = mapRef.current?.getMap();
+          if (map) setMap(map as any);
+        }}
+      >
         <NavigationControl position="top-right" />
         <GeolocateControl position="top-right" />
         <ScaleControl position="bottom-left" />
