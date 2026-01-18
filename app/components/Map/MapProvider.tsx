@@ -18,10 +18,11 @@ interface MapContextValue {
   setMap: (map: Map) => void;
   draw: TerraDraw | null;
   setDraw: (draw: TerraDraw | null) => void;
+  mapStyle: string;
+  setMapStyle: (style: string) => void;
   mode: MapViewMode;
   setMode: (mode: MapViewMode) => void;
   viewport: Viewport;
-  setViewport: (viewport: Viewport) => void;
 }
 
 interface Bounds {
@@ -45,15 +46,44 @@ interface Viewport {
 
 export const MapContext = createContext<MapContextValue | null>(null);
 
+const VIEWPORT_STORAGE_KEY = 'terra-logger-viewport';
+
 export function MapProvider({ children }: { children: React.ReactNode }) {
   const [map, setMap] = useState<Map | null>(null);
   const [draw, setDraw] = useState<TerraDraw | null>(null);
+  const [mapStyle, setMapStyle] = useState<string>("mapbox://styles/sebmartin/cl0daly1b002j15ldl6d0xcmh");
   const [mode, setMode] = useState<MapViewMode>({ type: "viewing" });
-  const [viewport, setViewport] = useState<Viewport>({
-    center: null,
-    zoom: 13,
-    bounds: null,
+  const [viewport, setViewport] = useState<Viewport>(() => {
+    // Initialize from localStorage
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(VIEWPORT_STORAGE_KEY);
+      if (stored) {
+        try {
+          console.log("[MapProvider] Initializing viewport from stored value");
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error('[MapProvider] Failed to parse stored viewport:', e);
+        }
+      }
+    }
+    console.log("[MapProvider] Initializing viewport to default");
+    return {
+      center: null,
+      zoom: 13,
+      bounds: null,
+    };
   });
+
+  // Persist viewport to localStorage (debounced)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem(VIEWPORT_STORAGE_KEY, JSON.stringify(viewport));
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [viewport]);
 
   // Keep map viewport in sync
   useEffect(() => {
@@ -89,10 +119,11 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
       setMap,
       draw,
       setDraw,
+      mapStyle,
+      setMapStyle,
       mode,
       setMode,
-      viewport,
-      setViewport,
+      viewport
     }}>
       {children}
     </MapContext.Provider>

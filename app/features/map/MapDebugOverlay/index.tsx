@@ -21,7 +21,7 @@ export function MapDebugOverlay() {
         </p>
       </div>
       <ExternalLink size={18} className="cursor-pointer" onClick={() => {
-        const url = `https://maps.google.com/maps/@${latitude.toFixed(4)},${longitude.toFixed(4)},${zoom.toFixed(0)}z`;
+        const url = `https://maps.google.com/maps/@${latitude.toFixed(4)},${longitude.toFixed(4)},${Math.round(zoom + 1)}z`;
         window.open(url, "_blank");
       }} />
     </div>
