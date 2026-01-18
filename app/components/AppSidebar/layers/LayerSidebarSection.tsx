@@ -1,8 +1,22 @@
-import { Layers } from "lucide-react";
+import { Layers, Plus, Upload } from "lucide-react";
 import ResizableSection from "../common/ResizableSection";
 import LayerList from "./LayerList";
+import { useSiteStore } from "@/app/stores/siteStore";
+import { useLayerStore } from "@/app/stores/layerStore";
+import { PanelProps } from "react-resizable-panels";
 
-export default function LayerSidebarSection() {
+export default function LayerSidebarSection({ ...props }: PanelProps) {
+  const selectedSiteId = useSiteStore((state) => state.selectedSiteId);
+  const setSelectedLayer = useLayerStore((state) => state.setSelectedLayerId);
+
+  const handleAddLayer = () => {
+    console.log("Add layer");
+  }
+
+  const handleUploadFeatures = () => {
+    console.log("Upload GeoJSON");
+  }
+
   return (
     <ResizableSection
       header={
@@ -10,9 +24,14 @@ export default function LayerSidebarSection() {
           <Layers size={14} /> <span>Layers</span>
         </>
       }
-      onAdd={() => {
-        console.log("Add layer");
+      icons={selectedSiteId ? [
+        { icon: Upload, onClick: handleUploadFeatures, tooltip: "Upload Feature(s)" },
+        { icon: Plus, onClick: handleAddLayer, tooltip: "Add a new Layer" },
+      ] : []}
+      onClick={() => {
+        setSelectedLayer(null);
       }}
+      {...props}
     >
       <LayerList />
     </ResizableSection>

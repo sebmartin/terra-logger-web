@@ -41,10 +41,10 @@ export default function AppSidebar() {
           <SidebarTrigger icon="left-close" />
         </SidebarHeader>
 
-        <ResizablePanelGroup orientation="vertical" className="flex-1">
-          <SiteSidebarSection />
+        <ResizablePanelGroup orientation="vertical">
+          <SiteSidebarSection defaultSize="20%" />
           <ResizableHandle />
-          <LayerSidebarSection />
+          <LayerSidebarSection defaultSize="30%" />
           <ResizableHandle />
           <FeatureSidebarSection />
         </ResizablePanelGroup>

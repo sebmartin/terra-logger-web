@@ -12,7 +12,10 @@ export function Item({ text, isSelected, onClick, onContextMenu, children }: Ite
         ? "bg-gradient-to-r from-green-50 to-indigo-50 border-l-4 border-l-green-300 shadow-sm"
         : "hover:bg-slate-50 hover:shadow-sm"
         }`}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
         onContextMenu?.(e);

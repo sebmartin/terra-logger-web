@@ -3,6 +3,7 @@ import "./globals.css";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { AppSidebar } from "./components/AppSidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { MapProvider } from "./components/Map/MapProvider";
 
 export const metadata: Metadata = {
   title: "Terra Logger",
@@ -14,12 +15,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>
-            <ErrorBoundary>
-              <div className="flex-1 h-full relative">{children}</div>
-            </ErrorBoundary>
-          </SidebarInset>
+          <MapProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <ErrorBoundary>
+                <div className="flex-1 h-full relative">{children}</div>
+              </ErrorBoundary>
+            </SidebarInset>
+          </MapProvider>
         </SidebarProvider>
       </body>
     </html>

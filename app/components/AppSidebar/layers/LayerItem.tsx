@@ -45,7 +45,7 @@ export default function LayerItem({
       >
         {layer.visible ? <Eye /> : <EyeOff />}
       </Toggle>
-      <ItemMenuButton open={showContextMenu} onOpenChange={setShowContextMenu}>
+      <ItemMenuButton label={layer.name} open={showContextMenu} onOpenChange={setShowContextMenu}>
         <DropdownMenuItem
           onClick={(e) => {
             e.stopPropagation();

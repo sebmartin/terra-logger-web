@@ -13,6 +13,7 @@ interface LayerStore {
   initialized: boolean;
 
   // Computed getters
+  selectedLayer: () => Layer | null;
   visibleLayerIds: () => Set<string>;
 
   // Actions
@@ -35,6 +36,10 @@ export const useLayerStore = create<LayerStore>()(
         initialized: false,
 
         // Computed getter
+        selectedLayer: () => {
+          const { layers, selectedLayerId } = get();
+          return layers.find((l) => l.id === selectedLayerId) ?? null;
+        },
         visibleLayerIds: () => {
           const { layers } = get();
           return new Set(layers.filter((l) => l.visible).map((l) => l.id));

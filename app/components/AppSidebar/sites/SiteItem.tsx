@@ -36,7 +36,7 @@ export default function SiteItem({
           setShowContextMenu(true);
         }}
       >
-        <ItemMenuButton open={showContextMenu} onOpenChange={setShowContextMenu}>
+        <ItemMenuButton label={site.name} open={showContextMenu} onOpenChange={setShowContextMenu}>
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation();

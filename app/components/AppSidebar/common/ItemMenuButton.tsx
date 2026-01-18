@@ -1,13 +1,14 @@
-import { DropdownMenu, DropdownMenuTrigger, Button, DropdownMenuContent } from "@/components/ui";
+import { DropdownMenu, DropdownMenuTrigger, Button, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui";
 import { EllipsisVertical } from "lucide-react";
 import { PropsWithChildren } from "react";
 
 interface ItemContextMenuProps extends PropsWithChildren {
+  label?: string;
   open: boolean;
   onOpenChange?: (open: boolean) => void;
 };
 
-export function ItemMenuButton({ open, onOpenChange, children }: ItemContextMenuProps) {
+export function ItemMenuButton({ label, open, onOpenChange, children }: ItemContextMenuProps) {
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
@@ -16,6 +17,12 @@ export function ItemMenuButton({ open, onOpenChange, children }: ItemContextMenu
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
+        {label && (
+          <>
+            <DropdownMenuLabel>{label}</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+          </>
+        )}
         {children}
       </DropdownMenuContent>
     </DropdownMenu>
