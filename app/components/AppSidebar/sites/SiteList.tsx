@@ -105,7 +105,7 @@ export default function SiteList() {
             <SiteItem
               key={site.id}
               site={site}
-              isActive={selectedSite?.id === site.id}
+              isSelected={selectedSite?.id === site.id}
               onSelect={(site) => setSelectedSiteId(site.id)}
               onEditBounds={handleEditSiteBounds}
               onDelete={handleDeleteSite}
@@ -121,14 +121,14 @@ export default function SiteList() {
         />
       )}
 
-      {showBoundsSelector && (
+      {/* {showBoundsSelector && (
         <BoundsSelector
           initialBounds={editingSite?.bounds}
           onCapture={handleCaptureBounds}
           onCancel={handleCancelBounds}
           title={editingSite ? "Adjust Site Bounds" : "Position Map to Capture Site Area"}
         />
-      )}
+      )} */}
     </>
   );
 }

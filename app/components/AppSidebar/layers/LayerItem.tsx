@@ -1,5 +1,11 @@
 import type { Layer } from "@/app/types/layer";
-import { IconButton } from "@/components/ui";
+import { DropdownMenuItem } from "@/components/ui";
+import { DeleteDialog } from "@/components/ui/delete-dialog";
+import { Toggle } from "@/components/ui/toggle";
+import { Edit, Eye, EyeOff, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ItemMenuButton } from "../common/ItemMenuButton";
+import { Item } from "../common/Item";
 
 interface LayerItemProps {
   layer: Layer;
@@ -16,37 +22,58 @@ export default function LayerItem({
   onToggleVisibility,
   onDelete,
 }: LayerItemProps) {
+  const [showDeleteLayerPrompt, setShowDeleteLayerPrompt] = useState(false);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+
   return (
-    <div
-      className={`mx-2 my-1 px-3 py-2.5 rounded-lg flex items-center gap-3 cursor-pointer transition-all duration-200 ${
-        isSelected
-          ? "bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-l-blue-600 shadow-sm"
-          : "hover:bg-slate-50 hover:shadow-sm"
-      }`}
+    <Item
+      text={layer.name}
+      isSelected={isSelected}
       onClick={() => onSelect(layer.id)}
+      onContextMenu={(_e) => {
+        setShowContextMenu(true);
+      }}
     >
-      <input
-        type="checkbox"
-        checked={layer.visible}
-        onChange={(e) => {
-          e.stopPropagation();
+      <Toggle
+        aria-label="Toggle visibility"
+        size="sm"
+        className="icon-btn-ghost h-6 w-6"
+        pressed={layer.visible}
+        onPressedChange={(_pressed) => {
           onToggleVisibility(layer.id);
         }}
-        title="Toggle visibility"
-        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 cursor-pointer"
-      />
-      <div className="flex-1 min-w-0">
-        <div className="font-medium text-sm text-slate-800 truncate">{layer.name}</div>
-      </div>
-      <IconButton
-        variant="delete"
-        onClick={(e) => {
-          e.stopPropagation();
+      >
+        {layer.visible ? <Eye /> : <EyeOff />}
+      </Toggle>
+      <ItemMenuButton open={showContextMenu} onOpenChange={setShowContextMenu}>
+        <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            // onEditBounds(site);
+          }}
+        >
+          <Edit size={14} /> Edit
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowDeleteLayerPrompt(true);
+          }}
+        >
+          <Trash2 size={14} /> Delete
+        </DropdownMenuItem>
+      </ItemMenuButton>
+      <DeleteDialog
+        open={showDeleteLayerPrompt}
+        title={`Delete the layer "${layer.name}"?`}
+        description="All features associated with this layer will also be deleted."
+        onCancel={() => setShowDeleteLayerPrompt(false)}
+        onDelete={() => {
+          setShowDeleteLayerPrompt(false);
           onDelete(layer.id, layer.name);
         }}
-        title="Delete"
-        icon="×"
       />
-    </div>
+    </Item>
   );
 }

@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -127,7 +126,30 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .icon-btn-ghost {
+    background-color: transparent !important;
+  }
+
+  .icon-btn-ghost svg {
+    color: rgb(30 41 59) !important; /* slate-800 */
+  }
+
+  .icon-btn-ghost:hover {
+    background-color: transparent !important;
+  }
+
+  .icon-btn-ghost:hover svg {
+    color: rgb(59 130 246) !important; /* blue-500 */
+  }
+
+  .icon-btn-ghost[data-state="on"] {
+    background-color: transparent !important;
   }
 }
