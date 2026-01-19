@@ -4,7 +4,7 @@
  */
 
 import type { Site, NewSite, SiteUpdate } from "../types/site";
-import { parseSite, parseSites } from "../utils/geojson";
+import { parseSite, parseSites } from "../types/schemas";
 
 function getBaseUrl() {
   if (typeof window !== 'undefined') return '';

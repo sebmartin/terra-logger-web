@@ -4,7 +4,7 @@
  */
 
 import type { Layer, NewLayer, LayerUpdate } from "../types/layer";
-import { parseLayer, parseLayers } from "../utils/geojson";
+import { parseLayer, parseLayers } from "../types/schemas";
 
 function getBaseUrl() {
   if (typeof window !== 'undefined') return '';

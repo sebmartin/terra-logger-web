@@ -9,7 +9,7 @@ export type FeatureType =
 
 export interface Feature {
   id: string;
-  site_id: string | null; // For site-level features
+  site_id: string | null; // For site-level features -- is this still necessary?
   layer_id: string | null; // For layer-specific features
   type: FeatureType;
   name: string | null;

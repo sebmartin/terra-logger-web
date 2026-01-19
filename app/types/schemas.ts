@@ -3,9 +3,9 @@
  */
 
 import { z } from "zod";
-import type { Feature } from "../types/feature";
-import type { Site } from "../types/site";
-import type { Layer } from "../types/layer";
+import type { Feature } from "./feature";
+import type { Site } from "./site";
+import type { Layer } from "./layer";
 
 // Zod schema for parsing JSON strings to objects
 const jsonString = z.string().transform((val) => JSON.parse(val));

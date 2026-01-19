@@ -1,8 +1,11 @@
 import { useMapContext } from "@/app/components/Map/MapProvider";
-import { Crosshair, ExternalLink, Search } from "lucide-react";
+import { useFeatureStore } from "@/app/stores/featureStore";
+import { Crosshair, ExternalLink, Search, VectorSquare } from "lucide-react";
 
 export function MapDebugOverlay() {
   const { map } = useMapContext();
+  const selectedFeature = useFeatureStore((s) => s.selectedFeature());
+
   if (!map) return null;
 
   const { lat: latitude, lng: longitude } = map.getCenter();
@@ -10,13 +13,21 @@ export function MapDebugOverlay() {
 
   return (
     <div className="flex gap-4 absolute bottom-2 right-2 bg-white bg-opacity-75 px-2 py-1 rounded z-10 text-sm">
-      <div className="flex items-center">
+      {selectedFeature && (
+        <div className="flex items-center gap-1">
+          <VectorSquare size={12} />
+          <p>
+            <strong>{selectedFeature.properties?.name ?? "No name"}</strong>
+          </p>
+        </div>
+      )}
+      <div className="flex items-center gap-1">
         <Search size={12} />
-        <p className="pl-2">{zoom.toFixed(2)}</p>
+        <p>{zoom.toFixed(2)}</p>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-1">
         <Crosshair size={12} />
-        <p className="pl-2">
+        <p>
           [{latitude.toFixed(6)}, {longitude.toFixed(6)}]
         </p>
       </div>

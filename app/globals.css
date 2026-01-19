@@ -2,7 +2,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@source "./**/*.{js,jsx,ts,tsx}";
+@source "./{app,components,lib}/**/*.{js,jsx,ts,tsx}";
 
 /* Full-height app layout */
 html,

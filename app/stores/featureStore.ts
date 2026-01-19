@@ -8,9 +8,9 @@ interface FeatureStore {
   // State
   features: Feature[];
   selectedFeatureId: string | null;
-  isDirty: boolean;
 
   // Actions
+  selectedFeature: () => Feature | null;
   setSelectedFeatureId: (id: string | null) => void;
   loadFeatures: () => Promise<void>;
   createFeature: (featureData: NewFeature) => Promise<Feature>;
@@ -24,7 +24,12 @@ export const useFeatureStore = create<FeatureStore>()(
       // Initial State
       features: [],
       selectedFeatureId: null,
-      isDirty: false,
+
+      // Getters
+      selectedFeature: () => {
+        const state = _get();
+        return state.features.find((f) => f.id === state.selectedFeatureId) || null;
+      },
 
       // Actions
       setSelectedFeatureId: (id) =>
@@ -48,20 +53,19 @@ export const useFeatureStore = create<FeatureStore>()(
         }
 
         try {
-          const allFeatures: Feature[] = [];
+          const visibleFeatures: Feature[] = [];
 
           for (const layerId of visibleLayerIds) {
             const layerFeatures = await featureService.list(layerId);
             console.log(
               `[FeatureStore] Loaded ${layerFeatures.length} features from layer ${layerId}`
             );
-            allFeatures.push(...layerFeatures);
+            visibleFeatures.push(...layerFeatures);
           }
 
-          console.log(`[FeatureStore] Total features loaded:`, allFeatures.length);
+          console.log(`[FeatureStore] Total visible features loaded:`, visibleFeatures.length);
           set((state) => {
-            state.features = allFeatures;
-            state.isDirty = false;
+            state.features = visibleFeatures;
           });
         } catch (error) {
           console.error("Failed to load features:", error);
@@ -85,7 +89,6 @@ export const useFeatureStore = create<FeatureStore>()(
 
           set((state) => {
             state.features.push(created);
-            state.isDirty = true;
           });
           return created;
         } catch (error) {
@@ -103,7 +106,6 @@ export const useFeatureStore = create<FeatureStore>()(
             if (index !== -1) {
               state.features[index] = updated;
             }
-            state.isDirty = true;
           });
           return updated;
         } catch (error) {
@@ -118,7 +120,6 @@ export const useFeatureStore = create<FeatureStore>()(
 
           set((state) => {
             state.features = state.features.filter((f) => f.id !== id);
-            state.isDirty = true;
 
             // Clear selection if the removed feature was selected
             if (state.selectedFeatureId === id) {
@@ -135,7 +136,6 @@ export const useFeatureStore = create<FeatureStore>()(
         set((state) => {
           state.features = [];
           state.selectedFeatureId = null;
-          state.isDirty = false;
         }),
     }))
 );

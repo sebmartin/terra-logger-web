@@ -4,7 +4,7 @@
  */
 
 import type { Feature, NewFeature, FeatureUpdate, FeatureType } from "../types/feature";
-import { parseFeature, parseFeatures } from "../utils/geojson";
+import { parseFeature, parseFeatures } from "../types/schemas";
 import { calculateMeasurements, type Measurements } from "../utils/measurements";
 
 function getBaseUrl() {

@@ -1,73 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import type { Site, SiteBounds } from "@/app/types/site";
 import { useSiteStore } from "@/app/stores/siteStore";
 import { Map } from "lucide-react";
 import SiteItem from "./SiteItem";
 import NewSiteDialog from "./NewSiteDialog";
-import BoundsSelector from "@/app/components/BoundsSelector/BoundsSelector";
 
 export default function SiteList() {
   const [showNewSiteDialog, setShowNewSiteDialog] = useState(false);
-  const [showBoundsSelector, setShowBoundsSelector] = useState(false);
-  const [editingSite, setEditingSite] = useState<Site | null>(null);
-  const [pendingSiteName, setPendingSiteName] = useState("");
 
   const sites = useSiteStore((state) => state.sites);
   const selectedSite = useSiteStore((state) => state.selectedSite());
   const setSelectedSiteId = useSiteStore((state) => state.setSelectedSiteId);
   const loading = useSiteStore((state) => state.loading);
   const initialized = useSiteStore((state) => state.initialized);
-  const createSite = useSiteStore((state) => state.createSite);
-  const updateSite = useSiteStore((state) => state.updateSite);
   const deleteSite = useSiteStore((state) => state.deleteSite);
-
-  const handleStartCreateSite = (siteName: string) => {
-    setPendingSiteName(siteName);
-    setShowNewSiteDialog(false);
-    setShowBoundsSelector(true);
-  };
-
-  const handleCaptureBounds = async (bounds: SiteBounds) => {
-    if (editingSite) {
-      try {
-        await updateSite(editingSite.id, { bounds });
-        setShowBoundsSelector(false);
-        setEditingSite(null);
-      } catch (error) {
-        console.error("Failed to update site bounds:", error);
-        alert("Failed to update site bounds");
-      }
-    } else {
-      try {
-        const site = await createSite({
-          name: pendingSiteName,
-          description: "",
-          bounds,
-        });
-        setSelectedSiteId(site.id);
-        setPendingSiteName("");
-        setShowBoundsSelector(false);
-      } catch (error) {
-        console.error("Failed to create site:", error);
-        alert("Failed to create site");
-      }
-    }
-  };
-
-  const handleCancelBounds = () => {
-    setShowBoundsSelector(false);
-    setEditingSite(null);
-    if (!editingSite) {
-      setShowNewSiteDialog(true);
-    }
-  };
-
-  const handleEditSiteBounds = (site: Site) => {
-    setEditingSite(site);
-    setShowBoundsSelector(true);
-  };
 
   const handleDeleteSite = async (id: string) => {
     try {
@@ -107,7 +54,7 @@ export default function SiteList() {
               site={site}
               isSelected={selectedSite?.id === site.id}
               onSelect={(site) => setSelectedSiteId(site.id)}
-              onEditBounds={handleEditSiteBounds}
+              onEditBounds={() => { }}
               onDelete={handleDeleteSite}
             />
           ))}
@@ -116,19 +63,10 @@ export default function SiteList() {
 
       {showNewSiteDialog && (
         <NewSiteDialog
-          onNext={handleStartCreateSite}
+          onNext={() => { }}
           onCancel={() => setShowNewSiteDialog(false)}
         />
       )}
-
-      {/* {showBoundsSelector && (
-        <BoundsSelector
-          initialBounds={editingSite?.bounds}
-          onCapture={handleCaptureBounds}
-          onCancel={handleCancelBounds}
-          title={editingSite ? "Adjust Site Bounds" : "Position Map to Capture Site Area"}
-        />
-      )} */}
     </>
   );
 }
