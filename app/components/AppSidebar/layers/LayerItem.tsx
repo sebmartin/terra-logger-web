@@ -27,7 +27,7 @@ export default function LayerItem({
 
   return (
     <Item
-      text={layer.name}
+      content={layer.name}
       isSelected={isSelected}
       onClick={() => onSelect(layer.id)}
       onContextMenu={(_e) => {

@@ -1,11 +1,11 @@
 interface ItemProps extends React.PropsWithChildren {
-  text: string;
+  content: React.ReactNode | string;
   isSelected?: boolean;
   onClick?: () => void;
   onContextMenu?: (e: React.MouseEvent) => void;
 }
 
-export function Item({ text, isSelected, onClick, onContextMenu, children }: ItemProps) {
+export function Item({ content, isSelected, onClick, onContextMenu, children }: ItemProps) {
   return (
     <div
       className={`mx-2 my-1 px-2 py-1 rounded-sm flex items-center gap-0 cursor-pointer transition-all duration-200 ${isSelected
@@ -22,7 +22,10 @@ export function Item({ text, isSelected, onClick, onContextMenu, children }: Ite
       }}
     >
       <div className="flex-1 min-w-0">
-        <div className="font-medium text-sm text-slate-800 truncate">{text}</div>
+        {typeof content === "string" && (
+          <div className="font-medium text-sm text-slate-800 truncate">{content}</div>
+        )}
+        {content && typeof content !== "string" && content}
       </div>
       {children}
     </div>

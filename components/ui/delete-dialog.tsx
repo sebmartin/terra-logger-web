@@ -17,14 +17,16 @@ export function DeleteDialog({ title, description, open, onCancel, onDelete }: D
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => {
+          <AlertDialogCancel onClick={(e) => {
+            e.stopPropagation();
             open = false;
             onCancel()
           }}>
             No
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               open = false;
               onDelete()
             }}

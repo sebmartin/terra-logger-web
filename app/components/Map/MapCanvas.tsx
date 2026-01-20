@@ -5,9 +5,7 @@ import { useSiteStore } from "@/app/stores/siteStore";
 
 interface MapCanvasProps extends React.PropsWithChildren { }
 
-export function MapCanvas(
-  { children }: MapCanvasProps
-) {
+export function MapCanvas({ children }: MapCanvasProps) {
   const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 
   const mapRef = useRef<MapRef>(null);
@@ -44,7 +42,7 @@ export function MapCanvas(
         { padding: { left: 240, top: 50, right: 50, bottom: 50 }, duration: 1000 }
       );
     }
-  }, [selectedSite, mapRef]);
+  }, [selectedSite]);
 
   return (
     <Map
@@ -53,14 +51,12 @@ export function MapCanvas(
       mapStyle={mapStyle}
       mapboxAccessToken={mapboxAccessToken}
       attributionControl={false}
-      onLoad={() => {
-        if (mapRef.current) {
-          console.log("[MapCanvas] Map loaded");
-          setMap(mapRef.current.getMap());
-        }
+      onLoad={(e) => {
+        console.log("[MapCanvas] Map loaded");
+        setMap(e.target);
       }}
     >
       {children}
     </Map>
   );
-};
+}

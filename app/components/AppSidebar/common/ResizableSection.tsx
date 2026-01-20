@@ -1,7 +1,7 @@
 import { Button, ScrollArea } from "@/components/ui";
 import { ResizablePanel } from "@/components/ui/resizable";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { LucideIcon, Plus } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 import { Panel } from "react-resizable-panels";
 
 interface SidebarGroupHeaderProps {

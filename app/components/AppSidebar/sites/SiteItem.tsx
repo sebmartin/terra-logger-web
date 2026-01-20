@@ -29,7 +29,7 @@ export default function SiteItem({
   return (
     <>
       <Item
-        text={site.name}
+        content={site.name}
         isSelected={isSelected}
         onClick={() => onSelect(site)}
         onContextMenu={(_e) => {
