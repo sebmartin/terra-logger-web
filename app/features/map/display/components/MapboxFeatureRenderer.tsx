@@ -2,9 +2,11 @@ import React, { useEffect } from "react";
 import { FeatureRenderer, createFeatureRenderer } from "../featureRenderer";
 import { useFeatureStore } from "@/app/stores/featureStore";
 import { useMapContext } from "@/app/components/Map/MapProvider";
+import { useLayerStore } from "@/app/stores/layerStore";
 
 export function MapboxFeatureRenderer() {
   const { map } = useMapContext();
+  const visibleLayerIds = useLayerStore((state) => state.visibleLayerIds);
   const allFeatures = useFeatureStore((state) => state.features);
   const rendererRef = React.useRef<FeatureRenderer>(null);
 
@@ -20,10 +22,11 @@ export function MapboxFeatureRenderer() {
     };
   }, [map]);
 
-  // TODO: update renderer features when they change
+  // Update renderer features when they change
   useEffect(() => {
+    console.log("[MapboxFeatureRenderer] Updating features in renderer");
     rendererRef.current?.updateFeatures(allFeatures);
-  }, [rendererRef, allFeatures]);
+  }, [rendererRef, allFeatures, visibleLayerIds]);
 
   // No components to render, this renderer works directly with the Mapbox map instance
   return null;

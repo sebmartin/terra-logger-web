@@ -3,6 +3,7 @@ import type { Map as MapboxMap } from "mapbox-gl";
 import { LAYER_DEFINITIONS } from "./layerDefinitions";
 import { featureAsGeoJSON } from "@/app/types/geojson";
 import { loadImageIcon } from "./utils/icons";
+import { useFeatureStore } from "@/app/stores/featureStore";
 
 export function createFeatureRenderer(mapInstance: MapboxMap) {
   let map = mapInstance;
@@ -39,20 +40,22 @@ export function createFeatureRenderer(mapInstance: MapboxMap) {
     }
   }
 
-  // Example implementation: Replace with actual rendering logic
   return {
-    /**
-     * Updates features in the source.
-     * - If there's a feature with the same ID, overwrite it.
-     * - If there's a feature with the same ID but the new one's geometry is `null`, remove it
-     * - If there's no such ID in existing data, add it as a new feature.
-     */
     updateFeatures: function (features: Feature[]) {
-      source.updateData({
+      const editingFeatureId = useFeatureStore.getState().editingFeatureId;
+      const visibleFeatures = features
+        .filter((f) => !editingFeatureId || f.id !== editingFeatureId)
+        .map(featureAsGeoJSON);
+      source.setData({
         type: "FeatureCollection",
-        features: features.map(featureAsGeoJSON),
+        features: visibleFeatures,
       });
+
+      console.log(
+        `[FeatureRenderer] Rendered ${visibleFeatures.length} features`
+      );
     },
+
     destroy() {
       // Remove layers first
       console.log("Destroying feature renderer");

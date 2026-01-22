@@ -1,13 +1,38 @@
 import { create } from "zustand";
 import type { Map as MapboxMap } from "mapbox-gl";
 import type { TerraDraw } from "terra-draw";
-import type { DrawMode, MapState } from "../types/map";
+
+export type DrawMode =
+  | "select"
+  | "marker"
+  | "polyline"
+  | "polygon"
+  | "rectangle"
+  | "measure";
+
+export interface Bounds {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
+export interface MapCenter {
+  lat: number;
+  lng: number;
+}
+
+export interface MapState {
+  center: MapCenter | null;
+  zoom: number;
+  bounds: Bounds | null;
+}
 
 interface MapStore {
   // State
   map: MapboxMap | null;
   draw: TerraDraw | null;
-  drawMode: DrawMode;
+  drawMode: DrawMode | null;
   mapState: MapState;
 
   // Actions

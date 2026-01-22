@@ -1,7 +1,7 @@
 import { MapDebugOverlay } from "@/app/components/Map/MapDebugOverlay";
 import { MapCanvas } from "./MapCanvas";
 import { MapboxFeatureRenderer } from "@/app/features/map/display/components/MapboxFeatureRenderer";
-import { MapInteractions } from "./MapInteractions";
+import { MapInteractions } from "../../features/map/interactions/components/MapInteractions";
 import { FeatureSheet } from "../FeatureSheet/FeatureSheet";
 
 export default function MapContainer() {
