@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
 import type { Map as MapboxMap } from "mapbox-gl";
 import type { TerraDraw } from "terra-draw";
 
@@ -42,26 +43,32 @@ interface MapStore {
   updateMapState: (state: Partial<MapState>) => void;
 }
 
-export const useMapStore = create<MapStore>()((set) => ({
-  // Initial State
-  map: null,
-  draw: null,
-  drawMode: null,
-  mapState: {
-    center: null,
-    zoom: 13,
-    bounds: null,
-  },
+export const useMapStore = create<MapStore>()(
+  immer((set) => ({
+    // Initial State
+    map: null,
+    draw: null,
+    drawMode: null,
+    mapState: {
+      center: null,
+      zoom: 13,
+      bounds: null,
+    },
 
-  // Actions
-  setMap: (map) => set({ map }),
+    // Actions
+    // Use direct set for non-draftable objects (Map/TerraDraw contain DOM refs)
+    setMap: (map) => set({ map }),
 
-  setDraw: (draw) => set({ draw }),
+    setDraw: (draw) => set({ draw }),
 
-  setDrawMode: (drawMode) => set({ drawMode }),
+    setDrawMode: (drawMode) =>
+      set((state) => {
+        state.drawMode = drawMode;
+      }),
 
-  updateMapState: (state) =>
-    set((prev) => ({
-      mapState: { ...prev.mapState, ...state },
-    })),
-}));
+    updateMapState: (update) =>
+      set((state) => {
+        Object.assign(state.mapState, update);
+      }),
+  }))
+);

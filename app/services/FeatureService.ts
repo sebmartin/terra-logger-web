@@ -6,12 +6,7 @@
 import type { Feature, NewFeature, FeatureUpdate, FeatureType } from "../types/feature";
 import { parseFeature, parseFeatures } from "../types/schemas";
 import { calculateMeasurements, type Measurements } from "../utils/measurements";
-
-function getBaseUrl() {
-  if (typeof window !== 'undefined') return '';
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return `http://localhost:${process.env.PORT || 3000}`;
-}
+import { getBaseUrl } from "./baseUrl";
 
 export class FeatureService {
   /**
@@ -61,7 +56,6 @@ export class FeatureService {
    * Update an existing feature
    */
   async update(featureId: string, updates: FeatureUpdate): Promise<Feature> {
-    console.log("[FeatureService] Updating feature:", featureId, updates);
     const response = await fetch(`${getBaseUrl()}/api/features/${featureId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -69,7 +63,6 @@ export class FeatureService {
     });
     if (!response.ok) throw new Error("Failed to update feature");
     const updated = await response.json();
-    console.log("[FeatureService] Updated feature:", updated);
     return parseFeature(updated);
   }
 

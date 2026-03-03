@@ -10,21 +10,9 @@ export function loadFeaturesIntoTerraDraw(
   features: Feature[]
 ): void {
   const snapshot = draw.getSnapshot();
-  console.log(
-    `[Sync] Features from DB: ${features.length}, Terra Draw snapshot: ${snapshot.length}`
-  );
 
   const existingDbIds = new Set(
     snapshot.map((f) => f.properties?.dbId).filter(Boolean)
-  );
-
-  console.log(
-    `[Sync] Existing DB IDs in Terra Draw:`,
-    existingDbIds.size
-  );
-  console.log(
-    `[Sync] Feature IDs from DB:`,
-    features.length,
   );
 
   // Add features from database that aren't in Terra Draw yet

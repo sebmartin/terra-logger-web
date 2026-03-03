@@ -31,7 +31,6 @@ export function MapCanvas({ children }: MapCanvasProps) {
     const map = mapRef.current?.getMap();
     if (!map || !selectedSite) return;
 
-    console.log("[MapCanvas] Flying to selected site:", selectedSite.name);
     const { bounds } = selectedSite;
     if (bounds) {
       map.fitBounds(
@@ -52,10 +51,10 @@ export function MapCanvas({ children }: MapCanvasProps) {
       mapboxAccessToken={mapboxAccessToken}
       attributionControl={false}
       onLoad={(e) => {
-        console.log("[MapCanvas] Map loaded");
         setMap(e.target);
       }}
     >
+      {/* Make this absolut positioning and flex? */}
       {children}
     </Map>
   );

@@ -12,7 +12,7 @@ export function MapDebugOverlay() {
   const zoom = map.getZoom();
 
   return (
-    <div className="flex gap-4 absolute bottom-2 right-2 bg-white bg-opacity-75 px-2 py-1 rounded z-10 text-sm">
+    <div className="flex gap-4 absolute bottom-2 right-2 bg-white bg-opacity-75 px-2 py-1 rounded text-sm pointer-events-auto">
       {selectedFeature && (
         <div className="flex items-center gap-1">
           <VectorSquare size={12} />

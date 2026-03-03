@@ -10,7 +10,7 @@ export default function FeatureSidebarSection() {
   const setSelectedLayerId = useLayerStore((state) => state.setSelectedLayerId);
 
   const handleAddFeature = () => {
-    console.log("Add feature");
+    // TODO: implement add feature
   }
 
   const handleClearLayerSelection = () => {

@@ -19,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <AppSidebar />
             <SidebarInset>
               <ErrorBoundary>
-                <div className="flex-1 h-full relative">{children}</div>
+                <div className="flex-1 h-full relative">
+                  {children}
+                </div>
               </ErrorBoundary>
             </SidebarInset>
           </MapProvider>

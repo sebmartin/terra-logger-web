@@ -47,13 +47,8 @@ export const useFeatureStore = create<FeatureStore>()(
      */
     loadFeatures: async () => {
       const visibleLayerIds = useLayerStore.getState().visibleLayerIds;
-      console.log(
-        `[FeatureStore] Loading features. Visible layers:`,
-        Array.from(visibleLayerIds)
-      );
 
       if (visibleLayerIds.size === 0) {
-        console.log(`[FeatureStore] No visible layers, clearing features`);
         set((state) => {
           state.features = [];
         });
@@ -65,13 +60,9 @@ export const useFeatureStore = create<FeatureStore>()(
 
         for (const layerId of visibleLayerIds) {
           const layerFeatures = await featureService.list(layerId);
-          console.log(
-            `[FeatureStore] Loaded ${layerFeatures.length} features from layer ${layerId}`
-          );
           visibleFeatures.push(...layerFeatures);
         }
 
-        console.log(`[FeatureStore] Total visible features loaded:`, visibleFeatures.length);
         set((state) => {
           state.features = visibleFeatures;
         });
@@ -146,7 +137,6 @@ export const useFeatureStore = create<FeatureStore>()(
 useLayerStore.subscribe(
   (state) => state.layers,
   () => {
-    console.log(`[FeatureStore] Layer visibility changed, reloading features`);
     useFeatureStore.getState().loadFeatures();
   }
 );

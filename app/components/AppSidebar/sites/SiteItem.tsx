@@ -49,7 +49,6 @@ export default function SiteItem({
             variant="destructive"
             onClick={(e) => {
               e.stopPropagation();
-              console.log(setShowDeleteSitePrompt);
               setShowDeleteSitePrompt(true);
             }}
           >

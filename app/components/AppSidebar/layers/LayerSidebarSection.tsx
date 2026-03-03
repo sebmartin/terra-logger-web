@@ -10,11 +10,11 @@ export default function LayerSidebarSection({ ...props }: PanelProps) {
   const setSelectedLayer = useLayerStore((state) => state.setSelectedLayerId);
 
   const handleAddLayer = () => {
-    console.log("Add layer");
+    // TODO: implement add layer
   }
 
   const handleUploadFeatures = () => {
-    console.log("Upload GeoJSON");
+    // TODO: implement upload GeoJSON
   }
 
   return (

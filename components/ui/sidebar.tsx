@@ -34,6 +34,7 @@ const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContextProps = {
   state: "expanded" | "collapsed"
+  width: string
   open: boolean
   setOpen: (open: boolean) => void
   openMobile: boolean
@@ -117,6 +118,7 @@ function SidebarProvider({
     () => ({
       state,
       open,
+      width: isMobile ? SIDEBAR_WIDTH_MOBILE : SIDEBAR_WIDTH,
       setOpen,
       isMobile,
       openMobile,
@@ -609,10 +611,8 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean
 }) {
-  // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
+  // eslint-disable-next-line react-hooks/purity -- shadcn skeleton placeholder, intentionally random
+  const width = React.useMemo(() => `${Math.floor(Math.random() * 40) + 50}%`, [])
 
   return (
     <div

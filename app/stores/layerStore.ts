@@ -83,10 +83,6 @@ export const useLayerStore = create<LayerStore>()(
 
         try {
           const loadedLayers = await layerService.listForSite(siteId);
-          console.log(`[LayerStore] Loaded ${loadedLayers.length} layers for site ${siteId}`);
-          loadedLayers.forEach((l) =>
-            console.log(`  - ${l.name} (${l.id}): visible=${l.visible}`)
-          );
           set((state) => {
             state.layers = loadedLayers;
             state.loading = false;
@@ -108,8 +104,6 @@ export const useLayerStore = create<LayerStore>()(
         if (!layer) {
           return;
         }
-        console.log("[LayerStore] Toggling visibility for layer:", layerId);
-
         try {
           // Update in database using service
           const updated = await layerService.toggleVisibility(layerId, layer.visible);
@@ -192,7 +186,6 @@ export const useLayerStore = create<LayerStore>()(
 useSiteStore.subscribe(
   (state) => state.selectedSiteId,
   (selectedSiteId: string | null) => {
-    console.log(`[LayerStore] Site changed to: ${selectedSiteId}`);
     useLayerStore.getState().loadLayers(selectedSiteId);
   }
 );

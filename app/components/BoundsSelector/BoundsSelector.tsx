@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { useMapStore } from "@/app/stores/mapStore";
+import { useMapContext } from "@/app/components/Map/MapProvider";
+import { Button } from "@/components/ui/button";
 import type { SiteBounds } from "@/app/types/site";
 
 interface BoundsSelectorProps {
@@ -18,7 +19,7 @@ export default function BoundsSelector({
   onCancel,
   title = "Position Map to Capture Site Area",
 }: BoundsSelectorProps) {
-  const map = useMapStore((state) => state.map);
+  const { map } = useMapContext();
   const [currentBounds, setCurrentBounds] = useState<SiteBounds | null>(null);
 
   // Set initial bounds if provided
@@ -111,19 +112,12 @@ export default function BoundsSelector({
         )}
 
         <div className="flex gap-2 justify-end">
-          <button
-            className="px-4 py-2 border border-gray-300 bg-white rounded transition-colors hover:bg-gray-50 text-sm"
-            onClick={onCancel}
-          >
+          <Button variant="outline" onClick={onCancel}>
             Cancel
-          </button>
-          <button
-            className="px-4 py-2 bg-blue-600 text-white border border-blue-600 rounded transition-colors hover:bg-blue-700 disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed text-sm"
-            onClick={handleCapture}
-            disabled={!currentBounds}
-          >
+          </Button>
+          <Button onClick={handleCapture} disabled={!currentBounds}>
             Capture This Area
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

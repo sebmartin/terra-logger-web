@@ -14,7 +14,6 @@ export function MapboxFeatureRenderer() {
   useEffect(() => {
     if (!map) return;
 
-    console.log("[MapboxFeatureRenderer] Initializing feature renderer");
     rendererRef.current = createFeatureRenderer(map);
 
     return () => {
@@ -24,7 +23,6 @@ export function MapboxFeatureRenderer() {
 
   // Update renderer features when they change
   useEffect(() => {
-    console.log("[MapboxFeatureRenderer] Updating features in renderer");
     rendererRef.current?.updateFeatures(allFeatures);
   }, [rendererRef, allFeatures, visibleLayerIds]);
 

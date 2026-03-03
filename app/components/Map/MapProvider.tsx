@@ -4,8 +4,12 @@ import { Map } from "mapbox-gl";
 import { createContext, useContext, useEffect, useState } from "react";
 import { TerraDraw } from "terra-draw";
 
-type GeometryType = "point" | "linestring" | "polygon" | "rectangle" | "circle";
+type GeometryType = "point" | "linestring" | "polygon" | "rectangle" | "circle"; // TODO: normalize this type of thing, I think there are dupes
 
+// TODO: selected feature and editing feature ID are stored differently between this and FeatureStore...
+//  I think the selected feature belongs here since it's map-instance-specific
+//  Stores are global state and probably shouldn't have UI state like "selected feature" and "editing feature ID"
+//  But layer visibility is in the store and that gets persisted too... hmm.
 type MapViewMode =
   | { type: 'viewing' }
   | { type: 'editing', featureId: string }
@@ -59,14 +63,12 @@ export function MapProvider({ children }: { children: React.ReactNode }) {
       const stored = localStorage.getItem(VIEWPORT_STORAGE_KEY);
       if (stored) {
         try {
-          console.log("[MapProvider] Initializing viewport from stored value");
           return JSON.parse(stored);
         } catch (e) {
           console.error('[MapProvider] Failed to parse stored viewport:', e);
         }
       }
     }
-    console.log("[MapProvider] Initializing viewport to default");
     return {
       center: null,
       zoom: 13,

@@ -26,6 +26,7 @@ export function useTerraDrawSetup(
   setMode: (mode: string) => void;
 } {
   const terraDrawRef = useRef<TerraDraw | null>(null);
+  const [draw, setDraw] = useState<TerraDraw | null>(null);
   const [ready, setReady] = useState(false);
   const [currentMode, setCurrentMode] = useState<string | null>(null);
 
@@ -41,6 +42,7 @@ export function useTerraDrawSetup(
           // Layers already destroyed by Mapbox
         }
         terraDrawRef.current = null;
+        setDraw(null);
         setReady(false);
       }
 
@@ -110,16 +112,12 @@ export function useTerraDrawSetup(
 
       // Store ref BEFORE starting so it's available immediately
       terraDrawRef.current = draw;
-      
+
       // Start TerraDraw - this begins listening to map events
-      console.log("[useTerraDrawSetup] Calling draw.start()");
       draw.start();
-      console.log("[useTerraDrawSetup] draw.start() completed, setting mode to select");
       draw.setMode("select");
       setCurrentMode("select");
-      
-      // Set ready state and notify - this triggers a re-render
-      console.log("[useTerraDrawSetup] TerraDraw ready, calling onReady callback");
+      setDraw(draw);
       setReady(true);
       onReady?.(draw);
     };
@@ -143,6 +141,7 @@ export function useTerraDrawSetup(
           // Ignore cleanup errors
         }
         terraDrawRef.current = null;
+        setDraw(null);
       }
     };
   }, [map, mapReady]);
@@ -151,14 +150,12 @@ export function useTerraDrawSetup(
     const draw = terraDrawRef.current;
     if (!draw) return;
 
-    console.log(`[Terra Draw] Setting mode to: ${mode}`);
-
     draw.setMode(mode);
     setCurrentMode(mode);
   };
 
   return {
-    draw: terraDrawRef.current,
+    draw,
     ready,
     currentMode,
     setMode,

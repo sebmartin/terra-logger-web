@@ -51,14 +51,10 @@ export function createFeatureRenderer(mapInstance: MapboxMap) {
         features: visibleFeatures,
       });
 
-      console.log(
-        `[FeatureRenderer] Rendered ${visibleFeatures.length} features`
-      );
     },
 
     destroy() {
       // Remove layers first
-      console.log("Destroying feature renderer");
       for (const layerId of layerIds) {
         if (map.getLayer(layerId)) {
           map.removeLayer(layerId);

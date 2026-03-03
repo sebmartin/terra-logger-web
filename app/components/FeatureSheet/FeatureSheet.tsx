@@ -16,7 +16,7 @@ export function FeatureSheet() {
         <SheetHeader>
           <SheetTitle>{selectedFeature?.name ?? "Unnamed Feature"}</SheetTitle>
           <SheetDescription>
-            This is going to be an awesome feature detail view. Some might say it's the best detail view. AMAZING DETAIL VIEW. Billions and billions.
+            This is going to be an awesome feature detail view. Some might say it&apos;s the best detail view. AMAZING DETAIL VIEW. Billions and billions.
           </SheetDescription>
         </SheetHeader>
         <ScrollArea className="flex-1">

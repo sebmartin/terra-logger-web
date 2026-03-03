@@ -17,7 +17,7 @@ function FloatingTrigger() {
       aria-hidden={open}
       className={
         [
-          "fixed top-2 left-2 z-20 p-4 mt-2",
+          "fixed top-2 left-2 z-999 p-4 mt-2",
           // Smooth fade + slide left when sidebar opens
           "transition-all ease-out",
           open
@@ -33,7 +33,7 @@ export default function AppSidebar() {
   return (
     <>
       <FloatingTrigger />
-      <Sidebar variant="floating">
+      <Sidebar variant="floating" className="z-1000">
         <SidebarHeader className="flex-row items-center justify-between border-b border-gray-400/50">
           <div className="flex flex-row items-center gap-2">
             <MapPinHouse size={20} /><div className="font-semibold">Terra Logger</div>
@@ -41,7 +41,7 @@ export default function AppSidebar() {
           <SidebarTrigger icon="left-close" />
         </SidebarHeader>
 
-        <ResizablePanelGroup orientation="vertical">
+        <ResizablePanelGroup orientation="vertical" className="z-200">
           <SiteSidebarSection defaultSize="20%" />
           <ResizableHandle />
           <LayerSidebarSection defaultSize="30%" />
