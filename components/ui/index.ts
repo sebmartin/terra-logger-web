@@ -108,6 +108,8 @@ export {
   ItemFooter,
 } from "./item";
 
+export { Input } from "./input";
+
 export { Label } from "./label";
 
 export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor } from "./popover";

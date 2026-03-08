@@ -1,47 +1,54 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Button } from "@/components/ui";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Button, Input } from "@/components/ui";
 
 interface NewSiteDialogProps {
-  onNext: (siteName: string) => void;
+  onSave: (siteName: string) => Promise<void>;
   onCancel: () => void;
 }
 
-export default function NewSiteDialog({ onNext, onCancel }: NewSiteDialogProps) {
+export default function NewSiteDialog({ onSave, onCancel }: NewSiteDialogProps) {
   const [siteName, setSiteName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
-    if (siteName.trim()) {
-      onNext(siteName.trim());
+  const handleSubmit = async () => {
+    if (!siteName.trim() || isSubmitting) return;
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await onSave(siteName.trim());
+    } catch {
+      setError("Failed to save site. Please try again.");
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog open onOpenChange={(open) => !open && onCancel()}>
+    <Dialog open>
       <DialogContent className="bg-white">
         <DialogHeader>
-          <DialogTitle>New Site</DialogTitle>
+          <DialogTitle>Name Your Site</DialogTitle>
         </DialogHeader>
         <div className="mt-2">
-          <input
+          <Input
             type="text"
             placeholder="Site name"
             value={siteName}
             onChange={(e) => setSiteName(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSubmit()}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             autoFocus
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <p className="text-sm text-gray-600 mt-2">
-            Next, you&apos;ll position the map to capture the site area.
-          </p>
+          {error && (
+            <p className="text-sm text-red-600 mt-2">{error}</p>
+          )}
           <div className="flex gap-2 justify-end mt-4">
-            <Button variant="outline" onClick={onCancel}>
+            <Button variant="outline" onClick={onCancel} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={!siteName.trim()}>
-              Next
+            <Button onClick={handleSubmit} disabled={!siteName.trim() || isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Site"}
             </Button>
           </div>
         </div>

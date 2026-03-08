@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { useSiteStore } from "@/app/stores/siteStore";
 import { Map } from "lucide-react";
+import { Button } from "@/components/ui";
 import SiteItem from "./SiteItem";
-import NewSiteDialog from "./NewSiteDialog";
 
-export default function SiteList() {
-  const [showNewSiteDialog, setShowNewSiteDialog] = useState(false);
+interface SiteListProps {
+  onAddSite: () => void;
+}
 
+export default function SiteList({ onAddSite }: SiteListProps) {
   const sites = useSiteStore((state) => state.sites);
   const selectedSite = useSiteStore((state) => state.selectedSite());
   const setSelectedSiteId = useSiteStore((state) => state.setSelectedSiteId);
@@ -16,14 +17,14 @@ export default function SiteList() {
   const initialized = useSiteStore((state) => state.initialized);
   const deleteSite = useSiteStore((state) => state.deleteSite);
 
-  const handleDeleteSite = async (id: string) => {
+  const handleDeleteSite = async (id: string, _name: string) => {
     try {
       await deleteSite(id);
     } catch (error) {
       console.error("Failed to delete site:", error);
-      alert("Failed to delete site");
     }
   };
+
   return (
     <>
       {!initialized || loading ? (
@@ -39,12 +40,7 @@ export default function SiteList() {
             <Map size={40} className="text-slate-400" strokeWidth={1.5} />
           </div>
           <p className="text-sm text-slate-600 mb-3 font-medium">No sites yet</p>
-          <button
-            onClick={() => setShowNewSiteDialog(true)}
-            className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-sm font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
-          >
-            Create Your First Site
-          </button>
+          <Button onClick={onAddSite}>Create Your First Site</Button>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto">
@@ -59,13 +55,6 @@ export default function SiteList() {
             />
           ))}
         </div>
-      )}
-
-      {showNewSiteDialog && (
-        <NewSiteDialog
-          onNext={() => { }}
-          onCancel={() => setShowNewSiteDialog(false)}
-        />
       )}
     </>
   );
