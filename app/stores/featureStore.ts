@@ -13,6 +13,7 @@ interface FeatureStore {
   // Actions
   selectedFeature: () => Feature | null;
   setSelectedFeatureId: (id: string | null) => void;
+  setEditingFeatureId: (id: string | null) => void;
   loadFeatures: () => Promise<void>;
   createFeature: (featureData: NewFeature) => Promise<Feature>;
   updateFeature: (id: string, updates: FeatureUpdate) => Promise<Feature>;

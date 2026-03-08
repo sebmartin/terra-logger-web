@@ -114,7 +114,12 @@ export function useTerraDrawSetup(
       terraDrawRef.current = draw;
 
       // Start TerraDraw - this begins listening to map events
-      draw.start();
+      try {
+        draw.start();
+      } catch (err) {
+        console.error("[useTerraDrawSetup] draw.start() threw:", err);
+        return;
+      }
       draw.setMode("select");
       setCurrentMode("select");
       setDraw(draw);
@@ -122,15 +127,11 @@ export function useTerraDrawSetup(
       onReady?.(draw);
     };
 
-    // Configure Terra Draw once the map style is fully loaded
-    // We also need to reconfigure when the map style changes
-    // Always listen for style.load first, then check if already loaded
-    // This avoids a race condition where both fire
+    // Initialize immediately — mapReady=true means onLoad has fired, which means
+    // the style is already loaded (onLoad fires after style.load in Mapbox GL JS v3).
+    // Also listen for future style changes (e.g. user switches map style).
     map.on("style.load", initializeTerraDrawWhenReady);
-    
-    if (map.isStyleLoaded()) {
-      initializeTerraDrawWhenReady();
-    }
+    initializeTerraDrawWhenReady();
 
     return () => {
       map.off("style.load", initializeTerraDrawWhenReady);

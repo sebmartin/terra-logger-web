@@ -1,4 +1,5 @@
 import { useFeatureStore } from "@/app/stores/featureStore";
+import { useMapContext } from "@/app/components/Map/MapProvider";
 import type { Feature } from "@/app/types/feature";
 import { DropdownMenuItem, FeatureIcon } from "@/components/ui";
 import { Toggle } from "@/components/ui/toggle";
@@ -7,6 +8,7 @@ import { Item } from "../common/Item";
 import { useState } from "react";
 import { DeleteDialog } from "@/components/ui/delete-dialog";
 import { ItemMenuButton } from "../common/ItemMenuButton";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface FeatureItemProps {
   feature: Feature;
@@ -17,6 +19,8 @@ export default function FeatureItem({ feature, onToggleLock }: FeatureItemProps)
   const selectedFeatureId = useFeatureStore((s) => s.selectedFeatureId);
   const setSelectedFeatureId = useFeatureStore((s) => s.setSelectedFeatureId);
   const deleteFeature = useFeatureStore((s) => s.deleteFeature);
+  const { setMode } = useMapContext();
+  const { setOpen } = useSidebar();
 
   const isSelected = selectedFeatureId === feature.id;
   const featureName = feature.name || "Unnamed Feature";
@@ -72,9 +76,13 @@ export default function FeatureItem({ feature, onToggleLock }: FeatureItemProps)
       </div>
       <ItemMenuButton label={featureName} open={showContextMenu} onOpenChange={setShowContextMenu}>
         <DropdownMenuItem
+          disabled={feature.locked}
           onClick={(e) => {
             e.stopPropagation();
-            // onEditBounds(site);
+            if (!feature.locked) {
+              setMode({ type: "editing", featureId: feature.id });
+              setOpen(false);
+            }
           }}
         >
           <Edit size={14} /> Edit

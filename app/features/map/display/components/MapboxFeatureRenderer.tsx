@@ -8,6 +8,7 @@ export function MapboxFeatureRenderer() {
   const { map } = useMapContext();
   const visibleLayerIds = useLayerStore((state) => state.visibleLayerIds);
   const allFeatures = useFeatureStore((state) => state.features);
+  const editingFeatureId = useFeatureStore((state) => state.editingFeatureId);
   const rendererRef = React.useRef<FeatureRenderer>(null);
 
   // Initialize renderer when map is ready
@@ -21,10 +22,13 @@ export function MapboxFeatureRenderer() {
     };
   }, [map]);
 
-  // Update renderer features when they change
+  // Update renderer features when they change, hiding the feature being edited
   useEffect(() => {
-    rendererRef.current?.updateFeatures(allFeatures);
-  }, [rendererRef, allFeatures, visibleLayerIds]);
+    const featuresToRender = editingFeatureId
+      ? allFeatures.filter((f) => f.id !== editingFeatureId)
+      : allFeatures;
+    rendererRef.current?.updateFeatures(featuresToRender);
+  }, [rendererRef, allFeatures, visibleLayerIds, editingFeatureId]);
 
   // No components to render, this renderer works directly with the Mapbox map instance
   return null;
