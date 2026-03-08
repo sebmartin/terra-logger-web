@@ -1,27 +1,32 @@
 import { useFeatureStore } from "@/app/stores/featureStore";
-import { useMapContext } from "@/app/components/Map/MapProvider";
 import { ScrollArea } from "@/components/ui";
 import { SheetContent, SheetHeader, SheetTitle, SheetDescription, Sheet } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { LockKeyhole, LockKeyholeOpen } from "lucide-react";
 
-export function FeatureSheet() {
+interface FeatureSheetProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export function FeatureSheet({ open, onOpenChange }: FeatureSheetProps) {
   const selectedFeature = useFeatureStore((s) => s.selectedFeature());
   const setSelectedFeatureId = useFeatureStore((s) => s.setSelectedFeatureId);
-  const { setMode } = useMapContext();
+  const updateFeature = useFeatureStore((s) => s.updateFeature);
 
-  const handleEdit = () => {
-    if (!selectedFeature || selectedFeature.locked) return;
-    setMode({ type: "editing", featureId: selectedFeature.id });
-    setSelectedFeatureId(null);
+  const handleToggleLock = () => {
+    if (!selectedFeature) return;
+    updateFeature(selectedFeature.id, { locked: !selectedFeature.locked }).catch(
+      (error) => console.error("Failed to toggle lock:", error)
+    );
   };
 
   return (
-    <Sheet open={!!selectedFeature} onOpenChange={(open) => {
-      if (open === false) {
-        setSelectedFeatureId(null);
-      }
+    <Sheet open={open} onOpenChange={(v) => {
+      onOpenChange(v);
+      if (!v) setSelectedFeatureId(null);
     }}>
-      <SheetContent side="right" className="w-96">
+      <SheetContent side="right" className="w-96" overlay={false}>
         <SheetHeader>
           <SheetTitle>{selectedFeature?.name ?? "Unnamed Feature"}</SheetTitle>
           <SheetDescription>
@@ -29,16 +34,20 @@ export function FeatureSheet() {
           </SheetDescription>
           <Button
             size="sm"
-            disabled={selectedFeature?.locked}
-            onClick={handleEdit}
+            variant="outline"
+            onClick={handleToggleLock}
           >
-            Edit
+            {selectedFeature?.locked ? (
+              <><LockKeyholeOpen size={14} /> Unlock</>
+            ) : (
+              <><LockKeyhole size={14} /> Lock</>
+            )}
           </Button>
         </SheetHeader>
         <ScrollArea className="flex-1">
           <pre className="p-2 text-xs">{JSON.stringify(selectedFeature, null, 2)}</pre>
         </ScrollArea>
       </SheetContent>
-    </Sheet >
+    </Sheet>
   );
 }

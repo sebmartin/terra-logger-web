@@ -1,4 +1,4 @@
-import { Delete, Plus, VectorSquare } from "lucide-react";
+import { Delete, VectorSquare } from "lucide-react";
 import ResizableSection from "../common/ResizableSection";
 import FeatureList from "./FeatureList";
 import { useLayerStore } from "@/app/stores/layerStore";
@@ -8,10 +8,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 export default function FeatureSidebarSection() {
   const selectedLayer = useLayerStore((state) => state.selectedLayer());
   const setSelectedLayerId = useLayerStore((state) => state.setSelectedLayerId);
-
-  const handleAddFeature = () => {
-    // TODO: implement add feature
-  }
 
   const handleClearLayerSelection = () => {
     setSelectedLayerId(null);
@@ -38,9 +34,7 @@ export default function FeatureSidebarSection() {
           )}
         </>
       }
-      icons={selectedLayer ? [
-        { icon: Plus, onClick: handleAddFeature, tooltip: "Add a new Feature" },
-      ] : []}
+      icons={[]}
     >
       <FeatureList />
     </ResizableSection>

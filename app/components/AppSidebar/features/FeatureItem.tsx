@@ -88,6 +88,15 @@ export default function FeatureItem({ feature, onToggleLock }: FeatureItemProps)
           <Edit size={14} /> Edit
         </DropdownMenuItem>
         <DropdownMenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleLock(feature.id, feature.locked);
+          }}
+        >
+          {feature.locked ? <LockKeyholeOpen size={14} /> : <LockKeyhole size={14} />}
+          {feature.locked ? "Unlock" : "Lock"}
+        </DropdownMenuItem>
+        <DropdownMenuItem
           variant="destructive"
           onClick={(e) => {
             e.stopPropagation();

@@ -12,8 +12,11 @@ import {
 import { TerraDrawMapboxGLAdapter } from "terra-draw-mapbox-gl-adapter";
 
 /**
- * Custom hook to initialize and manage Terra Draw instance
- * Handles mode registration and lifecycle management
+ * Custom hook to initialize and manage Terra Draw instance.
+ *
+ * Registers two named select modes:
+ *   "move"   — whole-feature drag + rotate + scale (no vertex editing)
+ *   "select" — full vertex editing + rotate + scale
  */
 export function useTerraDrawSetup(
   map: MapboxMap | null,
@@ -46,58 +49,84 @@ export function useTerraDrawSetup(
         setReady(false);
       }
 
+      const moveModeInstance = new TerraDrawSelectMode({
+        modeName: "move",
+        keyEvents: { deselect: "Escape", delete: "", rotate: ["r"], scale: ["s"] },
+        flags: {
+          polygon: { feature: { draggable: true, rotateable: true, scaleable: true } },
+          linestring: { feature: { draggable: true, rotateable: true, scaleable: true } },
+          point: { feature: { draggable: true } },
+          circle: { feature: { draggable: true } },
+          rectangle: { feature: { draggable: true, rotateable: true, scaleable: true } },
+        },
+      });
+
+      const selectModeInstance = new TerraDrawSelectMode({
+        modeName: "select",
+        keyEvents: {
+          deselect: "Escape",
+          delete: "Delete",
+          rotate: ["r"],
+          scale: ["s"],
+        },
+        flags: {
+          polygon: {
+            feature: {
+              scaleable: true,
+              rotateable: true,
+              draggable: false,
+              coordinates: {
+                midpoints: true,
+                draggable: true,
+                deletable: true,
+              },
+            },
+          },
+          linestring: {
+            feature: {
+              rotateable: true,
+              scaleable: true,
+              draggable: false,
+              coordinates: {
+                midpoints: true,
+                draggable: true,
+                deletable: true,
+              },
+            },
+          },
+          point: {
+            feature: {
+              draggable: false,
+            },
+          },
+          circle: {
+            feature: {
+              draggable: false,
+            },
+          },
+          rectangle: {
+            feature: {
+              rotateable: true,
+              scaleable: true,
+              draggable: false,
+              coordinates: {
+                resizable: "opposite",
+              },
+            },
+          },
+        },
+      });
+
       // Initialize Terra Draw with all drawing and editing modes
       const draw = new TerraDraw({
         tracked: true,
-        adapter: new TerraDrawMapboxGLAdapter({ 
+        adapter: new TerraDrawMapboxGLAdapter({
           map,
           coordinatePrecision: 9,
         }),
         modes: [
-          new TerraDrawSelectMode({
-            flags: {
-              polygon: {
-                feature: {
-                  scaleable: true,
-                  rotateable: true,
-                  draggable: true,
-                  coordinates: {
-                    midpoints: true,
-                    draggable: true,
-                    deletable: true,
-                  },
-                },
-              },
-              linestring: {
-                feature: {
-                  draggable: true,
-                  coordinates: {
-                    midpoints: true,
-                    draggable: true,
-                    deletable: true,
-                  },
-                },
-              },
-              point: {
-                feature: {
-                  draggable: true,
-                },
-              },
-              circle: {
-                feature: {
-                  draggable: true,
-                },
-              },
-              rectangle: {
-                feature: {
-                  draggable: true,
-                  coordinates: {
-                    resizable: "opposite",
-                  },
-                },
-              },
-            },
-          }),
+          moveModeInstance,
+          selectModeInstance,
           new TerraDrawPointMode(),
           new TerraDrawLineStringMode({
             pointerDistance: 10,

@@ -15,6 +15,7 @@ export function createFeatureRenderer(mapInstance: MapboxMap) {
     map.addSource(sourceId, {
       type: "geojson",
       dynamic: true,
+      promoteId: "id",
       data: {
         type: "FeatureCollection",
         features: [],

@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { useLayerStore } from "@/app/stores/layerStore";
 import { useSiteStore } from "@/app/stores/siteStore";
 import { Layers } from "lucide-react";
 import LayerItem from "./LayerItem";
 import NewLayerDialog from "./NewLayerDialog";
 
-export default function LayerList() {
-  const [showNewLayerDialog, setShowNewLayerDialog] = useState(false);
+interface LayerListProps {
+  showDialog: boolean;
+  setShowDialog: (v: boolean) => void;
+}
+
+export default function LayerList({ showDialog: showNewLayerDialog, setShowDialog: setShowNewLayerDialog }: LayerListProps) {
 
   const layers = useLayerStore((state) => state.layers);
   const toggleLayerVisibility = useLayerStore((state) => state.toggleLayerVisibility);

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useMapContext } from "@/app/components/Map/MapProvider";
 import { useFeatureStore } from "@/app/stores/featureStore";
+import { useLayerStore } from "@/app/stores/layerStore";
 import type { MapMouseEvent } from "mapbox-gl";
 
 const CLICKABLE_LAYERS = [
@@ -15,26 +16,62 @@ const CLICKABLE_LAYERS = [
  * Hook to handle feature click interactions on the map
  */
 export function useFeatureClick() {
-  const { map } = useMapContext();
+  const { map, mode, setMode } = useMapContext();
   const setSelectedFeatureId = useFeatureStore((s) => s.setSelectedFeatureId);
+  const setSelectedLayerId = useLayerStore((s) => s.setSelectedLayerId);
 
   useEffect(() => {
     if (!map) return;
 
     const handleClick = (e: MapMouseEvent) => {
-      // Query all rendered features at the click point
-      const features = map.queryRenderedFeatures(e.point, {
+      const mapFeatures = map.queryRenderedFeatures(e.point, {
         layers: CLICKABLE_LAYERS,
       });
 
-      if (features.length > 0) {
-        const featureId = features[0].properties?.id;
-        if (featureId) {
+      if (mapFeatures.length > 0) {
+        const featureId = mapFeatures[0].properties?.id;
+        const layerId = mapFeatures[0].properties?.layerId;
+        if (!featureId) return;
+
+        const feature = useFeatureStore
+          .getState()
+          .features.find((f) => f.id === featureId);
+
+        if (feature?.locked) {
+          // Locked feature clicks always show info and exit any active mode.
+          if (layerId) setSelectedLayerId(layerId);
           setSelectedFeatureId(featureId);
+          setMode({ type: "viewing" });
+          return;
         }
+      }
+
+      // TerraDraw owns interactions with unlocked features when moving or editing.
+      if (mode.type === "moving" || mode.type === "editing") return;
+
+      if (mapFeatures.length > 0) {
+        const featureId = mapFeatures[0].properties?.id;
+        const layerId = mapFeatures[0].properties?.layerId;
+        if (!featureId) return;
+
+        if (layerId) setSelectedLayerId(layerId);
+        setSelectedFeatureId(null);
+        setMode({ type: "moving", featureId });
       } else {
         setSelectedFeatureId(null);
       }
+    };
+
+    const handleDblClick = (e: MapMouseEvent) => {
+      if (mode.type !== "viewing") return;
+      const mapFeatures = map.queryRenderedFeatures(e.point, { layers: CLICKABLE_LAYERS });
+      if (!mapFeatures.length) return;
+      const featureId = mapFeatures[0].properties?.id;
+      if (!featureId) return;
+      const feature = useFeatureStore.getState().features.find((f) => f.id === featureId);
+      if (!feature || feature.locked) return;
+      if (mapFeatures[0].properties?.layerId) setSelectedLayerId(mapFeatures[0].properties.layerId);
+      setMode({ type: "editing", featureId });
     };
 
     // Change cursor on hover
@@ -47,11 +84,13 @@ export function useFeatureClick() {
     };
 
     map.on("click", handleClick);
+    map.on("dblclick", handleDblClick);
     map.on("mousemove", handleMouseMove);
 
     return () => {
       map.off("click", handleClick);
+      map.off("dblclick", handleDblClick);
       map.off("mousemove", handleMouseMove);
     };
-  }, [map, setSelectedFeatureId]);
+  }, [map, mode, setMode, setSelectedFeatureId, setSelectedLayerId]);
 }

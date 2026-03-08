@@ -1,4 +1,7 @@
+"use client";
+
 import { Layers, Plus, Upload } from "lucide-react";
+import { useState } from "react";
 import ResizableSection from "../common/ResizableSection";
 import LayerList from "./LayerList";
 import { useSiteStore } from "@/app/stores/siteStore";
@@ -6,11 +9,12 @@ import { useLayerStore } from "@/app/stores/layerStore";
 import { PanelProps } from "react-resizable-panels";
 
 export default function LayerSidebarSection({ ...props }: PanelProps) {
+  const [showNewLayerDialog, setShowNewLayerDialog] = useState(false);
   const selectedSiteId = useSiteStore((state) => state.selectedSiteId);
   const setSelectedLayer = useLayerStore((state) => state.setSelectedLayerId);
 
   const handleAddLayer = () => {
-    // TODO: implement add layer
+    setShowNewLayerDialog(true);
   }
 
   const handleUploadFeatures = () => {
@@ -33,7 +37,7 @@ export default function LayerSidebarSection({ ...props }: PanelProps) {
       }}
       {...props}
     >
-      <LayerList />
+      <LayerList showDialog={showNewLayerDialog} setShowDialog={setShowNewLayerDialog} />
     </ResizableSection>
   );
 }

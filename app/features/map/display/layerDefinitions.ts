@@ -27,8 +27,8 @@ export const LAYER_DEFINITIONS: Record<string, Array<LayerSpecification>> = {
       filter: ['==', ['get', 'featureType'], 'Polygon'],
       type: "fill",
       paint: {
-        "fill-color": "#0000FF",
-        "fill-opacity": 0.3,
+        "fill-color": ["case", ["boolean", ["feature-state", "selected"], false], "#FF8C00", "#0000FF"],
+        "fill-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 0.6, 0.3],
       },
     } satisfies FillLayerSpecification,
     {
@@ -37,8 +37,8 @@ export const LAYER_DEFINITIONS: Record<string, Array<LayerSpecification>> = {
       filter: ['==', ['get', 'featureType'], 'Polygon'],
       type: "line",
       paint: {
-        "line-color": "#0000FF",
-        "line-width": 4,
+        "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#FF8C00", "#0000FF"],
+        "line-width": ["case", ["boolean", ["feature-state", "selected"], false], 5, 4],
       },
     } satisfies LineLayerSpecification
   ],
@@ -49,8 +49,8 @@ export const LAYER_DEFINITIONS: Record<string, Array<LayerSpecification>> = {
       filter: ['==', ['get', 'featureType'], 'Polyline'],
       type: "line",
       paint: {
-        "line-color": "#FF0000",
-        "line-width": 3,
+        "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#FF8C00", "#FF0000"],
+        "line-width": ["case", ["boolean", ["feature-state", "selected"], false], 5, 3],
       },
     } satisfies LineLayerSpecification
   ],
@@ -61,8 +61,8 @@ export const LAYER_DEFINITIONS: Record<string, Array<LayerSpecification>> = {
       filter: ['==', ['get', 'featureType'], 'Rectangle'],
       type: "fill",
       paint: {
-        "fill-color": "#0000FF",
-        "fill-opacity": 0.3,
+        "fill-color": ["case", ["boolean", ["feature-state", "selected"], false], "#FF8C00", "#0000FF"],
+        "fill-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 0.6, 0.3],
       },
     } satisfies FillLayerSpecification,
     {
@@ -71,8 +71,8 @@ export const LAYER_DEFINITIONS: Record<string, Array<LayerSpecification>> = {
       filter: ['==', ['get', 'featureType'], 'Rectangle'],
       type: "line",
       paint: {
-        "line-color": "#0000FF",
-        "line-width": 4,
+        "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#FF8C00", "#0000FF"],
+        "line-width": ["case", ["boolean", ["feature-state", "selected"], false], 5, 4],
       },
     } satisfies LineLayerSpecification
   ],
@@ -83,8 +83,8 @@ export const LAYER_DEFINITIONS: Record<string, Array<LayerSpecification>> = {
       filter: ['==', ['get', 'featureType'], 'Circle'],
       type: "fill",
       paint: {
-        "fill-color": "#0000FF",
-        "fill-opacity": 0.3,
+        "fill-color": ["case", ["boolean", ["feature-state", "selected"], false], "#FF8C00", "#0000FF"],
+        "fill-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 0.6, 0.3],
       },
     } satisfies FillLayerSpecification,
     {
@@ -93,8 +93,8 @@ export const LAYER_DEFINITIONS: Record<string, Array<LayerSpecification>> = {
       filter: ['==', ['get', 'featureType'], 'Circle'],
       type: "line",
       paint: {
-        "line-color": "#0000FF",
-        "line-width": 4,
+        "line-color": ["case", ["boolean", ["feature-state", "selected"], false], "#FF8C00", "#0000FF"],
+        "line-width": ["case", ["boolean", ["feature-state", "selected"], false], 5, 4],
       },
     } satisfies LineLayerSpecification
   ],

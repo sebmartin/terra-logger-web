@@ -4,7 +4,7 @@ import { Map } from "mapbox-gl";
 import { createContext, useContext, useEffect, useState } from "react";
 import { TerraDraw } from "terra-draw";
 
-type GeometryType = "point" | "linestring" | "polygon" | "rectangle" | "circle"; // TODO: normalize this type of thing, I think there are dupes
+export type GeometryType = "point" | "linestring" | "polygon" | "rectangle" | "circle"; // TODO: normalize this type of thing, I think there are dupes
 
 // TODO: selected feature and editing feature ID are stored differently between this and FeatureStore...
 //  I think the selected feature belongs here since it's map-instance-specific
@@ -13,6 +13,7 @@ type GeometryType = "point" | "linestring" | "polygon" | "rectangle" | "circle";
 type MapViewMode =
   | { type: 'viewing' }
   | { type: 'editing', featureId: string }
+  | { type: 'moving', featureId: string }
   | { type: 'drawing', geometryType: GeometryType }
   | { type: 'measuring', geometryType: GeometryType } // TODO: like drawing mode but temporary shape to measure is not saved
   | { type: 'tracking' }; // TODO
