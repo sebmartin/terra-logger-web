@@ -52,7 +52,7 @@ export function MapContextPanel() {
   };
 
   return (
-    <div className="absolute bottom-4 left-4 right-4 md:bottom-auto md:left-auto md:top-4 md:right-4 md:w-96 z-[1050] pointer-events-auto">
+    <div className="absolute bottom-4 left-4 right-4 md:bottom-auto md:left-auto md:top-4 md:right-4 z-[1050] pointer-events-auto">
       <div className={PANEL_CLASS}>
         <TooltipProvider delayDuration={400}>
           <div key={contentKey} className="animate-in fade-in-0 duration-200">

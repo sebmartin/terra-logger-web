@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
+import { Button } from "@/components/ui/button";
 
 function ErrorFallback({ error, resetErrorBoundary }: {
   error: Error;
@@ -17,12 +18,9 @@ function ErrorFallback({ error, resetErrorBoundary }: {
             {error.message}
           </pre>
         </details>
-        <button
-          onClick={resetErrorBoundary}
-          className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-        >
+        <Button onClick={resetErrorBoundary} className="w-full">
           Try again
-        </button>
+        </Button>
       </div>
     </div>
   );

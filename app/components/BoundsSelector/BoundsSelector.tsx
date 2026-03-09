@@ -22,12 +22,12 @@ export default function BoundsSelector({
   const { map } = useMapContext();
   const [currentBounds, setCurrentBounds] = useState<SiteBounds | null>(null);
 
-  // Set initial bounds if provided
+  // Set initial bounds if provided (Mapbox expects [lng, lat] per corner: [[west, south], [east, north]])
   useEffect(() => {
     if (map && initialBounds) {
       map.fitBounds([
-        [initialBounds.south, initialBounds.west],
-        [initialBounds.north, initialBounds.east],
+        [initialBounds.west, initialBounds.south],
+        [initialBounds.east, initialBounds.north],
       ]);
     }
   }, [map, initialBounds]);
