@@ -26,7 +26,7 @@ export const INSTRUCTIONS: Record<GeometryType, string> = {
 export const VERTEX_EDITABLE_TYPES: FeatureType[] = ["Polyline", "Polygon", "Rectangle"];
 
 export const PANEL_CLASS =
-  "bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden w-96";
+  "bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden w-full";
 
 export function getMeasurement(feature: Feature | null | undefined): string {
   if (!feature) return "";

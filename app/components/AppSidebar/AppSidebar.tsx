@@ -21,7 +21,7 @@ function FloatingTrigger() {
           // Smooth fade + slide left when sidebar opens
           "transition-all ease-out",
           open
-            ? "opacity-0 pointer-events-none duration-100 "
+            ? "md:opacity-0 md:pointer-events-none duration-100 "
             : "opacity-100 delay-250 duration-400"
         ].join(" ")
       }

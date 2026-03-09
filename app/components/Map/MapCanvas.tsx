@@ -38,7 +38,7 @@ export function MapCanvas({ children }: MapCanvasProps) {
           [bounds.west, bounds.south],
           [bounds.east, bounds.north],
         ],
-        { padding: { left: 240, top: 50, right: 50, bottom: 50 }, duration: 1000 }
+        { padding: { left: 240, top: 50, right: 50, bottom: window.innerWidth < 768 ? 120 : 50 }, duration: 1000 }
       );
     }
   }, [selectedSite]);

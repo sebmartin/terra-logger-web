@@ -26,7 +26,7 @@ export function FeatureSheet({ open, onOpenChange }: FeatureSheetProps) {
       onOpenChange(v);
       if (!v) setSelectedFeatureId(null);
     }}>
-      <SheetContent side="right" className="w-96" overlay={false}>
+      <SheetContent side="right" className="w-full md:w-96" overlay={false}>
         <SheetHeader>
           <SheetTitle>{selectedFeature?.name ?? "Unnamed Feature"}</SheetTitle>
           <SheetDescription>
