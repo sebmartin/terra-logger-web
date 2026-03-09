@@ -10,7 +10,7 @@ export type GeometryType = "point" | "linestring" | "polygon" | "rectangle" | "c
 //  I think the selected feature belongs here since it's map-instance-specific
 //  Stores are global state and probably shouldn't have UI state like "selected feature" and "editing feature ID"
 //  But layer visibility is in the store and that gets persisted too... hmm.
-type MapViewMode =
+export type MapViewMode =
   | { type: 'viewing' }
   | { type: 'editing', featureId: string }
   | { type: 'moving', featureId: string }
