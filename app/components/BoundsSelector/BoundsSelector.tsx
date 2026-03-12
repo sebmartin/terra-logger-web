@@ -67,7 +67,7 @@ export default function BoundsSelector({
   };
 
   return createPortal(
-    <div className="absolute inset-0 z-[1000] pointer-events-none">
+    <div className="absolute inset-0 z-[1000] pointer-events-none" data-testid="bounds-selector">
       <div className="absolute inset-0 pointer-events-none">
         {/* Dark overlay borders */}
         <div className="absolute top-0 left-0 right-0 h-[60px] bg-black/50 pointer-events-none" />

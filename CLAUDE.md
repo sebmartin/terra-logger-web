@@ -12,6 +12,10 @@ Next.js 16 (App Router) + React 19 + TypeScript 5 + Mapbox GL JS + Terra-Draw + 
 - `npm run build` -- production build
 - `npm run lint` -- lint (ESLint flat config)
 - `npx tsc --noEmit` -- type check
+- `npm run test` -- component tests (Vitest, watch)
+- `npm run test:run` -- component tests (single run, CI-friendly)
+- `npm run test:e2e` -- E2E tests (Playwright; starts dev server if not running)
+- `npm run test:e2e:ui` -- E2E tests with Playwright UI
 
 ## Data Model
 
@@ -158,6 +162,12 @@ import { createRenderer } from "./renderer";
 2. Add layer definitions in `app/features/map/display/layerDefinitions.ts`
 3. Update Terra-Draw modes in hooks
 4. Update geometry mapping in `useTerraDrawEvents.ts`
+
+### Testing
+
+- **Component tests**: Vitest + React Testing Library. Tests live under `app/**/*.test.{ts,tsx}`. Use `renderWithProviders` and `MockMapProvider` from `app/test/test-utils.tsx` for components that use `useMapContext()`. Stores are reset between tests in setup; services are mocked so no real API is called.
+- **E2E**: Playwright in `e2e/`. Use `data-testid` on key elements (e.g. `app-sidebar`, `sidebar-add-site`, `bounds-selector`) for stable selectors.
+- No `console.log` in tests; use `console.error` only for real errors.
 
 ### Add a UI component
 

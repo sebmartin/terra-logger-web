@@ -6,16 +6,25 @@ import { Panel } from "react-resizable-panels";
 
 interface SidebarGroupHeaderProps {
   children: React.ReactNode;
-  icons?: Array<{ icon: LucideIcon; onClick: () => void; tooltip?: string }>;
+  icons?: Array<{
+    icon: LucideIcon;
+    onClick: () => void;
+    tooltip?: string;
+    testId?: string;
+  }>;
 }
-
 
 export interface ResizableSectionProps extends Omit<
   React.ComponentProps<typeof Panel>,
   "content"
 > {
   header: React.ReactNode;
-  icons?: Array<{ icon: LucideIcon; onClick: () => void; tooltip?: string }>;
+  icons?: Array<{
+    icon: LucideIcon;
+    onClick: () => void;
+    tooltip?: string;
+    testId?: string;
+  }>;
 }
 
 export default function ResizableSection({
@@ -39,12 +48,18 @@ function SidebarGroupHeader({ children, icons }: SidebarGroupHeaderProps) {
       <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">{children}</div>
       {icons && icons.length > 0 && (
         <div className="flex items-center gap-1">
-          {icons.map(({ icon: Icon, onClick, tooltip }, index) => {
+          {icons.map(({ icon: Icon, onClick, tooltip, testId }, index) => {
             const button = (
-              <Button variant="ghost" size="icon" className="size-5" onClick={(e) => {
-                e.stopPropagation();
-                onClick();
-              }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-5"
+                data-testid={testId}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClick();
+                }}
+              >
                 <Icon size={12} />
               </Button>
             );

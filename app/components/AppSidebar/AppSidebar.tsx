@@ -33,7 +33,7 @@ export default function AppSidebar() {
   return (
     <>
       <FloatingTrigger />
-      <Sidebar variant="floating" className="z-1000">
+      <Sidebar variant="floating" className="z-1000" data-testid="app-sidebar">
         <SidebarHeader className="flex-row items-center justify-between border-b border-gray-400/50">
           <div className="flex flex-row items-center gap-2">
             <MapPinHouse size={20} /><div className="font-semibold">Terra Logger</div>

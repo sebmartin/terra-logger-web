@@ -53,7 +53,12 @@ export default function SiteSidebarSection({ ...props }: PanelProps) {
           </>
         }
         icons={[
-          { icon: Plus, onClick: handleStartAddSite, tooltip: "Add a new Site" },
+          {
+            icon: Plus,
+            onClick: handleStartAddSite,
+            tooltip: "Add a new Site",
+            testId: "sidebar-add-site",
+          },
         ]}
         {...props}
       >

@@ -18,7 +18,7 @@ export type MapViewMode =
   | { type: 'measuring', geometryType: GeometryType } // TODO: like drawing mode but temporary shape to measure is not saved
   | { type: 'tracking' }; // TODO
 
-interface MapContextValue {
+export interface MapContextValue {
   map: Map | null;
   setMap: (map: Map) => void;
   draw: TerraDraw | null;
