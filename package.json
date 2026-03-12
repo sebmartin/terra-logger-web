@@ -1,90 +1,67 @@
 {
   "name": "terra-logger",
-  "productName": "Terra Logger",
   "version": "0.1.0",
-  "description": "Electron app for designing offgrid cabin layouts using geospatial tools",
-  "main": "dist-electron/main/main.js",
+  "description": "Next.js app for designing offgrid cabin layouts using geospatial tools",
   "author": "Your Name",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
-    "electron:build": "npm run build && electron-builder",
-    "electron:build:mac": "npm run build && electron-builder --mac",
-    "electron:build:win": "npm run build && electron-builder --win",
-    "electron:build:linux": "npm run build && electron-builder --linux",
-    "postinstall": "electron-builder install-app-deps"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
   },
   "dependencies": {
-    "@geoman-io/leaflet-geoman-free": "^2.16.0",
-    "@turf/turf": "^7.1.0",
-    "better-sqlite3": "^11.8.1",
-    "leaflet": "^1.9.4",
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
+    "@radix-ui/react-checkbox": "^1.3.3",
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-context-menu": "^2.2.16",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-toggle": "^1.1.10",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@turf/area": "^7.3.1",
+    "@turf/helpers": "^7.3.1",
+    "@turf/length": "^7.3.1",
+    "@types/mapbox-gl": "^3.4.1",
+    "better-sqlite3": "^12.5.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "immer": "^11.1.3",
     "lucide-react": "^0.562.0",
+    "mapbox-gl": "^3.17.0",
+    "next": "^16.1.1",
+    "radix-ui": "^1.4.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-leaflet": "^5.0.0",
-    "uuid": "^10.0.0",
-    "zod": "^3.24.1"
+    "react-error-boundary": "^6.0.2",
+    "react-map-gl": "^8.1.0",
+    "react-resizable-panels": "^4.4.1",
+    "tailwind-merge": "^3.4.0",
+    "terra-draw": "^1.25.0",
+    "terra-draw-mapbox-gl-adapter": "^1.2.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.9"
   },
   "devDependencies": {
-    "@eslint/js": "^9.18.0",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/better-sqlite3": "^7.6.12",
-    "@types/leaflet": "^1.9.15",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/uuid": "^10.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "concurrently": "^9.1.2",
-    "cross-env": "^7.0.3",
-    "electron": "^33.3.1",
-    "electron-builder": "^25.1.8",
-    "electron-devtools-installer": "^3.2.0",
     "eslint": "^9.18.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.16",
-    "globals": "^15.14.0",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0",
-    "vite": "^6.0.6",
-    "vite-plugin-electron": "^0.28.8",
-    "vite-plugin-electron-renderer": "^0.14.5",
-    "wait-on": "^8.0.1"
-  },
-  "build": {
-    "appId": "com.terralogger.app",
-    "productName": "Terra Logger",
-    "directories": {
-      "output": "dist-electron/builder"
-    },
-    "files": [
-      "dist-renderer/**/*",
-      "dist-electron/**/*"
-    ],
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "category": "public.app-category.productivity"
-    },
-    "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ],
-      "category": "Utility"
-    }
+    "eslint-config-next": "^16.1.6",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.7.4",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.7.3"
   }
 }

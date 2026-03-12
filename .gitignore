@@ -6,11 +6,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Next.js
+.next/
+out/
+
 # Build output
 dist/
-dist-electron/
-dist-renderer/
-out/
 *.local
 
 # Environment variables
@@ -21,9 +22,12 @@ out/
 .env.production.local
 
 # Database
-*.db
-*.db-shm
-*.db-wal
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Claude settings
+.claude/settings.local.json
 
 # Editor directories and files
 .vscode/*
@@ -52,3 +56,4 @@ coverage/
 
 # Debug
 .vscode-test/
+tsconfig.tsbuildinfo

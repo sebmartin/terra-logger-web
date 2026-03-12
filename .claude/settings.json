@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(.git/**)",
+      "Read(node_modules/**)",
+      "Read(dist/**)",
+      "Read(build/**)",
+      "Read(.next/**)",
+      "Read(coverage/**)",
+      "Read(.env*)",
+      "Glob(.git/**)",
+      "Glob(node_modules/**)",
+      "Grep(**/.git/**)",
+      "Grep(**/node_modules/**)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true
+  }
+}

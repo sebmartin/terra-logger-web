@@ -1,0 +1,193 @@
+import { useEffect, useRef, useState } from "react";
+import { Map as MapboxMap } from "mapbox-gl";
+import {
+  TerraDraw,
+  TerraDrawSelectMode,
+  TerraDrawPointMode,
+  TerraDrawLineStringMode,
+  TerraDrawPolygonMode,
+  TerraDrawRectangleMode,
+  TerraDrawCircleMode,
+} from "terra-draw";
+import { TerraDrawMapboxGLAdapter } from "terra-draw-mapbox-gl-adapter";
+
+/**
+ * Custom hook to initialize and manage Terra Draw instance.
+ *
+ * Registers two named select modes:
+ *   "move"   — whole-feature drag + rotate + scale (no vertex editing)
+ *   "select" — full vertex editing + rotate + scale
+ */
+export function useTerraDrawSetup(
+  map: MapboxMap | null,
+  mapReady: boolean,
+  onReady?: (draw: TerraDraw) => void
+): {
+  draw: TerraDraw | null;
+  ready: boolean;
+  currentMode: string | null;
+  setMode: (mode: string) => void;
+} {
+  const terraDrawRef = useRef<TerraDraw | null>(null);
+  const [draw, setDraw] = useState<TerraDraw | null>(null);
+  const [ready, setReady] = useState(false);
+  const [currentMode, setCurrentMode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!mapReady || !map) return;
+
+    const initializeTerraDrawWhenReady = () => {
+      // Clean up existing instance
+      if (terraDrawRef.current) {
+        try {
+          terraDrawRef.current.stop();
+        } catch (error) {
+          // Layers already destroyed by Mapbox
+        }
+        terraDrawRef.current = null;
+        setDraw(null);
+        setReady(false);
+      }
+
+      const moveModeInstance = new TerraDrawSelectMode({
+        modeName: "move",
+        keyEvents: { deselect: "Escape", delete: "", rotate: ["r"], scale: ["s"] },
+        flags: {
+          polygon: { feature: { draggable: true, rotateable: true, scaleable: true } },
+          linestring: { feature: { draggable: true, rotateable: true, scaleable: true } },
+          point: { feature: { draggable: true } },
+          circle: { feature: { draggable: true } },
+          rectangle: { feature: { draggable: true, rotateable: true, scaleable: true } },
+        },
+      });
+
+      const selectModeInstance = new TerraDrawSelectMode({
+        modeName: "select",
+        keyEvents: {
+          deselect: "Escape",
+          delete: "Delete",
+          rotate: ["r"],
+          scale: ["s"],
+        },
+        flags: {
+          polygon: {
+            feature: {
+              scaleable: true,
+              rotateable: true,
+              draggable: false,
+              coordinates: {
+                midpoints: true,
+                draggable: true,
+                deletable: true,
+              },
+            },
+          },
+          linestring: {
+            feature: {
+              rotateable: true,
+              scaleable: true,
+              draggable: false,
+              coordinates: {
+                midpoints: true,
+                draggable: true,
+                deletable: true,
+              },
+            },
+          },
+          point: {
+            feature: {
+              draggable: false,
+            },
+          },
+          circle: {
+            feature: {
+              draggable: false,
+            },
+          },
+          rectangle: {
+            feature: {
+              rotateable: true,
+              scaleable: true,
+              draggable: false,
+              coordinates: {
+                resizable: "opposite",
+              },
+            },
+          },
+        },
+      });
+
+      // Initialize Terra Draw with all drawing and editing modes
+      const draw = new TerraDraw({
+        tracked: true,
+        adapter: new TerraDrawMapboxGLAdapter({
+          map,
+          coordinatePrecision: 9,
+        }),
+        modes: [
+          moveModeInstance,
+          selectModeInstance,
+          new TerraDrawPointMode(),
+          new TerraDrawLineStringMode({
+            pointerDistance: 10,
+          }),
+          new TerraDrawPolygonMode({
+            pointerDistance: 10,
+          }),
+          new TerraDrawRectangleMode(),
+          new TerraDrawCircleMode(),
+        ],
+      });
+
+      // Store ref BEFORE starting so it's available immediately
+      terraDrawRef.current = draw;
+
+      // Start TerraDraw - this begins listening to map events
+      try {
+        draw.start();
+      } catch (err) {
+        console.error("[useTerraDrawSetup] draw.start() threw:", err);
+        return;
+      }
+      draw.setMode("select");
+      setCurrentMode("select");
+      setDraw(draw);
+      setReady(true);
+      onReady?.(draw);
+    };
+
+    // Initialize immediately — mapReady=true means onLoad has fired, which means
+    // the style is already loaded (onLoad fires after style.load in Mapbox GL JS v3).
+    // Also listen for future style changes (e.g. user switches map style).
+    map.on("style.load", initializeTerraDrawWhenReady);
+    initializeTerraDrawWhenReady();
+
+    return () => {
+      map.off("style.load", initializeTerraDrawWhenReady);
+      if (terraDrawRef.current) {
+        try {
+          terraDrawRef.current.stop();
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+        terraDrawRef.current = null;
+        setDraw(null);
+      }
+    };
+  }, [map, mapReady]);
+
+  const setMode = (mode: string) => {
+    const draw = terraDrawRef.current;
+    if (!draw) return;
+
+    draw.setMode(mode);
+    setCurrentMode(mode);
+  };
+
+  return {
+    draw,
+    ready,
+    currentMode,
+    setMode,
+  };
+}
